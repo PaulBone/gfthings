@@ -5,33 +5,7 @@ from ocp_vscode import show, show_object, reset_show, set_port, set_defaults, ge
 set_port(3939)
 
 from parameters import *
-
-class Base(BasePartObject):
-    def __init__(self, rotation: tuple[float, float, float] | Rotation = (0, 0, 0), align: Align | tuple[Align, Align, Align] = None, mode: Mode = Mode.ADD):
-        with BuildPart() as p:
-            with BuildSketch():
-                RectangleRounded(bin_size, bin_size, radius=outer_rad)
-            extrude(amount=plate_height)
-            
-            with BuildLine(mode=Mode.PRIVATE):
-                b = bin_size/2
-                path = FilletPolyline((-b, -b), (-b, b), (b, b), (b, -b),
-                                    radius=outer_rad, close=True)
-                
-            with BuildSketch(Plane(origin=path@0, z_dir=path%0).rotated((-90, 0, 0))):
-                with BuildLine():
-                        Polyline(
-                            (0, 0),
-                            (0, plate_height),
-                            (-plate_height_c, plate_height_a + plate_height_b + plate_base_height),
-                            (-plate_height_c, plate_height_a + plate_base_height),
-                            (-plate_height_a - plate_height_c, plate_base_height),
-                            (-plate_height_a - plate_height_c, 0),
-                            close=True)
-                make_face()
-            sweep(path=path, mode=Mode.SUBTRACT)
-
-        super().__init__(part=p.part, rotation=rotation, align=align, mode=mode)
+from GFProfile import GFProfile
 
 class ScrewSupport(BasePartObject):
     def __init__(self, rotation: tuple[float, float, float] | Rotation = (0, 0, 0), align: Align | tuple[Align, Align, Align] = None, mode: Mode = Mode.ADD):
@@ -71,7 +45,7 @@ class BaseSquare(BasePartObject):
         with BuildPart() as p:
             Box(bin_size, bin_size, plate_height)
             with Locations((0, 0, -plate_height/2)):
-                Base(mode=Mode.SUBTRACT)
+                GFProfile(mode=Mode.SUBTRACT)
 
             with Locations(vertices().group_by(Axis.Z)[0].group_by(Axis.X)[0].sort_by(Axis.Y)[0]):
                 ScrewSupport(align=(Align.MIN, Align.MIN, Align.MIN))

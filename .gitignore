@@ -1,0 +1,3 @@
+*.step
+__pycache__
+.venv

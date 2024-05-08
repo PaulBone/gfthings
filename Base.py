@@ -5,7 +5,7 @@ from ocp_vscode import show, show_object, reset_show, set_port, set_defaults, ge
 set_port(3939)
 
 from parameters import *
-from GFProfile import GFProfile
+from GFProfile import GFProfilePlate
 
 class ScrewSupport(BasePartObject):
     def __init__(self, rotation: tuple[float, float, float] | Rotation = (0, 0, 0), align: Align | tuple[Align, Align, Align] = None, mode: Mode = Mode.ADD):
@@ -25,17 +25,16 @@ class EdgeCut(BasePartObject):
     def __init__(self, cutout_long_len, rotation: tuple[float, float, float] | Rotation = (0, 0, 0), align: Align | tuple[Align, Align, Align] = None, mode: Mode = Mode.ADD):
         with BuildPart() as p:
             import math
-            height = plate_height_a + plate_height_b + plate_height_c
-            tri_len = math.tan(30.0 * math.pi/180.0)*height
+            tri_len = math.tan(30.0 * math.pi/180.0)*plate_height
             cutout_short_len = cutout_long_len - tri_len*2
 
             with Locations((0, 0, -3)):
                 with BuildSketch(Plane.XY):
-                    Rectangle(cutout_short_len, height)
+                    Rectangle(cutout_short_len, plate_height)
                     with Locations(edges().filter_by(Axis.Y).sort_by(Axis.X)[0]@0.5):
-                        Triangle(a=height, b=tri_len, C=90, align=(Align.CENTER, Align.MIN), rotation=90)
+                        Triangle(a=plate_height, b=tri_len, C=90, align=(Align.CENTER, Align.MIN), rotation=90)
                     with Locations(edges().filter_by(Axis.Y).sort_by(Axis.X)[-1]@0.5):
-                        Triangle(a=tri_len, b=height, C=90, align=(Align.MAX, Align.CENTER), rotation=180)
+                        Triangle(a=tri_len, b=plate_height, C=90, align=(Align.MAX, Align.CENTER), rotation=180)
             extrude(amount=6)
             fillet(edges().filter_by(Axis.Z).group_by(Axis.Y)[0], radius=2)
         super().__init__(p.part, rotation, align, mode)
@@ -43,9 +42,7 @@ class EdgeCut(BasePartObject):
 class BaseSquare(BasePartObject):
     def __init__(self, rotation: tuple[float, float, float] | Rotation = (0, 0, 0), align: Align | tuple[Align, Align, Align] = None, mode: Mode = Mode.ADD):
         with BuildPart() as p:
-            Box(bin_size, bin_size, plate_height)
-            with Locations((0, 0, -plate_height/2)):
-                GFProfile(mode=Mode.SUBTRACT)
+            GFProfilePlate()
 
             with Locations(vertices().group_by(Axis.Z)[0].group_by(Axis.X)[0].sort_by(Axis.Y)[0]):
                 ScrewSupport(align=(Align.MIN, Align.MIN, Align.MIN))
@@ -59,7 +56,7 @@ class BaseSquare(BasePartObject):
                         faces().filter_by(Plane.YZ).sort_by(Axis.X)[-1],
                         faces().filter_by(Plane.XZ).sort_by(Axis.Y)[0],
                         faces().filter_by(Plane.XZ).sort_by(Axis.Y)[-1]):
-                with Locations((plate_height/2, 0, 0)):
+                with Locations(((plate_height + plate_base_height)/2, 0, 0)):
                     EdgeCut(edge_cut_len, align=(Align.CENTER, Align.MAX, Align.CENTER), rotation=(0, 0, -90), mode=Mode.SUBTRACT)
         super().__init__(p.part, rotation, align, mode)
 
@@ -95,4 +92,3 @@ class ClipEdge(BasePartObject):
             fillet(edges().filter_by(Axis.Z).group_by(Axis.Y)[1].sort_by(Axis.X)[0], radius=0.18)
         
         super().__init__(p.part, rotation, align, mode)
-

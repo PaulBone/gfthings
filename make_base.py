@@ -9,9 +9,9 @@ from Base import *
 
 with BuildPart() as p:
     BaseSquare()
-    with Locations((-bin_size/2, 0, -plate_height/2 + 4.7)):
+    with Locations((-bin_size/2, 0, -(plate_height + plate_base_height)/2 + 4.7)):
         ClipEdge(edge_cut_len, rotation=(0, 0, 0), align=(Align.MIN, Align.CENTER, Align.MAX))
-    with Locations((bin_size/2, 0, -plate_height/2 + 4.7)):
+    with Locations((bin_size/2, 0, -(plate_height + plate_base_height)/2 + 4.7)):
         ClipEdge(edge_cut_len, rotation=(0, 0, 180), align=(Align.MIN, Align.CENTER, Align.MAX))
 
 show(p.part)

@@ -10,11 +10,12 @@ from parameters import *
 class GFProfile(BasePartObject):
     def __init__(self, width : int = 1,
                        depth : int = 1,
-                       bin_size : float = 42,
-                       clearance : float = 0,
-                       corner_dia : float = 8,
+                       bin_size : float = bin_size,
+                       clearance : float = bin_clearance,
+                       corner_dia : float = base_outer_dia,
                        base : float = 0,
                        support : float = 0,
+                       inner_clearance : float = 0,
                        rotation: tuple[float, float, float] | Rotation = (0, 0, 0),
                        align: Align | tuple[Align, Align, Align] = None,
                        mode: Mode = Mode.ADD):
@@ -23,7 +24,7 @@ class GFProfile(BasePartObject):
                 RectangleRounded(bin_size * width - clearance * 2,
                                  bin_size * depth - clearance * 2,
                                  radius=corner_dia/2)
-            extrude(amount=plate_height + base + support)
+            extrude(amount=plate_height + base + support - inner_clearance)
             
             with BuildLine(mode=Mode.PRIVATE):
                 w = width*bin_size/2 - clearance
@@ -38,11 +39,11 @@ class GFProfile(BasePartObject):
                 with BuildLine():
                         Polyline(
                             (0, support),
-                            (0, support + plate_height + base),
-                            (-plate_height_c, support + plate_height_a + plate_height_b + base),
-                            (-plate_height_c, support + plate_height_a + base),
-                            (-plate_height_a - plate_height_c, support + base),
-                            (-plate_height_a - plate_height_c, support),
+                            (0, support + plate_height + base - inner_clearance),
+                            (-plate_height_c, support + plate_height_a - inner_clearance + plate_height_b + base),
+                            (-plate_height_c, support + plate_height_a - inner_clearance + base),
+                            (-plate_height_a + inner_clearance - plate_height_c, support + base),
+                            (-plate_height_a + inner_clearance - plate_height_c, support),
                             (0, 0),
                             close=True)
                         
@@ -55,7 +56,7 @@ class GFProfilePlate(BasePartObject):
         with BuildPart() as p:
             Box(bin_size, bin_size, plate_height + plate_base_height)
             with Locations(faces().filter_by(Plane.XY).sort_by(Axis.Z)[-1].center()):
-                GFProfile(base=plate_base_height, mode=Mode.SUBTRACT, align=(Align.CENTER, Align.CENTER, Align.MAX))                
+                GFProfile(base=plate_base_height, mode=Mode.SUBTRACT, align=(Align.CENTER, Align.CENTER, Align.MAX))
             
         super().__init__(p.part, rotation, align, mode)
 
@@ -66,24 +67,24 @@ class GFProfileBin(BasePartObject):
         super().__init__(p.part, rotation, align, mode)
 
 class GFProfileLip(BasePartObject):
-    def __init__(self, width : int = 1, depth : int = 1, support : float = 60, base : float = 0.8, 
+    def __init__(self, width : int = 1, depth : int = 1, support : float = 60, base : float = 0.8, shelf_clearance : float = 0.1,
                  rotation: tuple[float, float, float] | Rotation = (0, 0, 0), align: Align | tuple[Align, Align, Align] = None, mode: Mode = Mode.ADD):
-        size = 42
-        clearance = 0.5
-        dia = 7.5
         import math
         support_height = math.tan(support*math.pi/180.0) / (plate_height_a + plate_height_c)
         with BuildPart() as p:
             with BuildSketch(Plane.XY):
-                RectangleRounded(width * size - clearance*2, depth * size - clearance*2, radius=dia/2)
-            extrude(amount=plate_height + support_height + base)
+                RectangleRounded(width * bin_size - bin_clearance*2,
+                                 depth * bin_size - bin_clearance*2,
+                                 radius=outer_rad)
+            extrude(amount=plate_height + support_height + base - shelf_clearance)
 
             with Locations(faces().filter_by(Plane.XY).sort_by(Axis.Z)[-1]):
-                GFProfile(width, depth, bin_size=42,
-                          clearance=clearance,
-                          corner_dia=7.5,
+                GFProfile(width, depth, bin_size=bin_size,
+                          clearance=bin_clearance,
+                          corner_dia=outer_rad*2,
                           support=support_height,
                           base=0.8,
+                          inner_clearance=shelf_clearance,
                           mode=Mode.SUBTRACT,
                           align=(Align.CENTER, Align.CENTER, Align.MAX))
         super().__init__(p.part, rotation, align, mode)

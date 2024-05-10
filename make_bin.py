@@ -21,8 +21,13 @@ class BinBase(BasePartObject):
         super().__init__(p.part, rotation, align, mode)
 
 class Scoop(BasePartObject):
-    def __init__(self, rad : float, len : float, height : float, wall_thickness : float, rotation: tuple[float, float, float] | Rotation = (0, 0, 0), align: Align | tuple[Align, Align, Align] = None, mode: Mode = Mode.ADD):
-        wall_pad = plate_height_a + plate_height_c - wall_thickness
+    def __init__(self, rad : float, len : float, height : float,
+                 wall_thickness : float,
+                 shelf_clearance : float,
+                 rotation: tuple[float, float, float] | Rotation = (0, 0, 0),
+                 align: Align | tuple[Align, Align, Align] = None,
+                 mode: Mode = Mode.ADD):
+        wall_pad = plate_height_a + plate_height_c - wall_thickness - shelf_clearance
         with BuildPart() as p:
             with BuildSketch(Plane.YZ):
                 Rectangle(rad, rad)
@@ -35,23 +40,68 @@ class Scoop(BasePartObject):
         super().__init__(p.part, rotation, align, mode)
 
 class BinLip(BasePartObject):
-    def __init__(self, width : int, depth : int, rotation: tuple[float, float, float] | Rotation = (0, 0, 0), align: Align | tuple[Align, Align, Align] = None, mode: Mode = Mode.ADD):
+    def __init__(self, width : int, depth : int, shelf_clearance : float,
+                 rotation: tuple[float, float, float] | Rotation = (0, 0, 0),
+                 align: Align | tuple[Align, Align, Align] = None,
+                 mode: Mode = Mode.ADD):
         with BuildPart() as p:
-            GFProfileLip(width, depth, support=60, base=0.8)
+            GFProfileLip(width, depth, support=max_overhang_angle,
+                         base=0.8, shelf_clearance=shelf_clearance)
 
         super().__init__(p.part, rotation, align, mode)
 
+class LabelShelf(BasePartObject):
+    def __init__(self, len : float,
+                 shelf_clearance : float,
+                 rotation: tuple[float, float, float] | Rotation = (0, 0, 0),
+                 align: Align | tuple[Align, Align, Align] = None,
+                 mode: Mode = Mode.ADD):
+        shelf_depth=12
+        edge_depth=1.2
+        shelf_height = 2
+        depth_from_wall = plate_height_a - shelf_clearance + plate_height_c - wall_thickness
+        depth = shelf_depth + edge_depth + depth_from_wall
+        inner_height = 1
+        with BuildPart() as p:
+            Box(len, depth, shelf_height)
+            with BuildSketch(Plane(faces().filter_by(Plane.XY).sort_by(Axis.Z)[-1])):
+                with Locations((0, depth/2 - depth_from_wall)):
+                    RectangleRounded(len - depth_from_wall*2, shelf_depth,
+                                     outer_rad - plate_height_a - plate_height_c,
+                                     align=(Align.CENTER, Align.MAX))
+            extrude(amount=-inner_height, mode=Mode.SUBTRACT)
+            fillet(edges().filter_by(Axis.X).group_by(Axis.Y)[0].group_by(Axis.Z)[-1], radius=min(shelf_height, edge_depth*0.75))
+            with BuildSketch(Plane(
+                    origin=edges().filter_by(Axis.Y).group_by(Axis.Z)[0].sort_by(Axis.X)[0]@1,
+                    x_dir=(0, 1, 0),
+                    z_dir=(1, 0, 0))):
+                import math
+                support_height = depth / math.tan(max_overhang_angle * math.pi / 180.0)
+                with BuildLine():
+                    Polyline((0, 0),
+                             (0, -support_height),
+                             (-depth, 0),
+                             close=True)
+                make_face()
+            extrude(amount=len)
+            
+        super().__init__(p.part, rotation, align, mode)
+
 class Bin(BasePartObject):
-    def __init__(self, width : int, depth : int, height_units : int, scoop_rad : float, rotation: tuple[float, float, float] | Rotation = (0, 0, 0), align: Align | tuple[Align, Align, Align] = None, mode: Mode = Mode.ADD):
+    def __init__(self, width : int, depth : int,
+                 height_units : int,
+                 scoop_rad : float,
+                 divisions : int = 1,
+                 rotation: tuple[float, float, float] | Rotation = (0, 0, 0),
+                 align: Align | tuple[Align, Align, Align] = None,
+                 mode: Mode = Mode.ADD):
         height = 7 * height_units
-        bin_clearance = 0.5
-        wall_thickness = 1.2
+        shelf_clearance = 0.1
         with BuildPart() as p:
             wall_height = height - plate_height
-            
-            Box(width * bin_size - bin_clearance * 2,
-                depth * bin_size - bin_clearance * 2,
-                wall_height)
+            box_width = width * bin_size - bin_clearance * 2
+            box_depth = depth * bin_size - bin_clearance * 2
+            Box(box_width, box_depth, wall_height)
             fillet(edges().filter_by(Axis.Z), radius=outer_rad)
             with Locations((0, 0, -wall_height/2)):
                 with GridLocations(bin_size, bin_size, width, depth):
@@ -65,13 +115,36 @@ class Bin(BasePartObject):
             inner_height = wall_height - wall_thickness
             extrude(amount=-inner_height, mode=Mode.SUBTRACT)
 
+            inner_front_centre = faces().filter_by(Plane.XY).sort_by(Axis.Z)[-2].edges().filter_by(Axis.X).sort_by(Axis.Y)[0]@0.5
+            if divisions > 1:
+                dividors = divisions-1
+                dividor_space = inner_width / divisions
+                with Locations(inner_front_centre):
+                    with GridLocations(dividor_space, 1, dividors, 1):
+                        # Use inner_height if there's no shelf, otherwise subtract the shelf's cuttout depth.
+                        Box(wall_thickness, inner_depth, inner_height - 2, align=(Align.CENTER, Align.MIN, Align.MIN))
+
             if scoop_rad and scoop_rad > 0:
-                with Locations(faces().filter_by(Plane.XY).sort_by(Axis.Z)[-2].edges().filter_by(Axis.X).sort_by(Axis.Y)[0]@0.5):
-                    Scoop(scoop_rad, inner_width, inner_height, wall_thickness, align=(Align.CENTER, Align.MIN, Align.MIN)) 
+                with Locations(inner_front_centre):
+                    Scoop(scoop_rad, inner_width, inner_height, wall_thickness, shelf_clearance, align=(Align.CENTER, Align.MIN, Align.MIN)) 
 
             with Locations((0, 0, wall_height/2 + plate_height)):
-                BinLip(width, depth, align=(Align.CENTER, Align.CENTER, Align.MAX))
+                BinLip(width, depth, shelf_clearance=shelf_clearance,
+                       align=(Align.CENTER, Align.CENTER, Align.MAX))
             
+            with Locations(Plane(origin=faces().filter_by(Plane.XZ).sort_by(Axis.Y)[-1].edges().filter_by(Axis.X).sort_by(Axis.Z)[-1]@0.5)):
+                with Locations((0, -wall_thickness, -plate_height)):
+                    LabelShelf(box_width - 2*wall_thickness, shelf_clearance, align=(Align.CENTER, Align.MAX, Align.MAX))
+                    # Cut out parts for the label to fit under.
+                    with Locations((0, -label_depth/2 - plate_height_a - plate_height_c + wall_thickness, 0)):
+                        Box(box_width - 2*wall_thickness, label_tab_depth, 1,
+                            align=(Align.CENTER, Align.CENTER, Align.MAX),
+                            mode=Mode.SUBTRACT)
+            
+            # Round off the top edge because it's too sharp for 3D printing.
+            fillet(edges().group_by(Axis.Z)[-1], radius=0.25)
+
         super().__init__(p.part, rotation, align, mode)
 
-show_object(Bin(2, 1, 3, 12), "test")
+export_step(Bin(2, 1, 4, 12.5, divisions=3), "box.step")
+show_object(Bin(2, 1, 4, 12.5, divisions=3), "test")

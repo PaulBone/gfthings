@@ -8,10 +8,9 @@ set_port(3939)
 from parameters import *
 
 class GFProfile(BasePartObject):
-    def __init__(self, width : int = 1,
-                       depth : int = 1,
-                       bin_size : float = bin_size,
-                       clearance : float = bin_clearance,
+    def __init__(self, width : float = 1,
+                       depth : float = 1,
+                       clearance : float = 0,
                        corner_dia : float = base_outer_dia,
                        base : float = 0,
                        support : float = 0,
@@ -21,14 +20,14 @@ class GFProfile(BasePartObject):
                        mode: Mode = Mode.ADD):
         with BuildPart() as p:
             with BuildSketch():
-                RectangleRounded(bin_size * width - clearance * 2,
-                                 bin_size * depth - clearance * 2,
+                RectangleRounded(width * bin_size - clearance * 2,
+                                 depth * bin_size - clearance * 2,
                                  radius=corner_dia/2)
             extrude(amount=plate_height + base + support - inner_clearance)
             
             with BuildLine(mode=Mode.PRIVATE):
-                w = width*bin_size/2 - clearance
-                d = depth*bin_size/2 - clearance
+                w = width * bin_size/2 - clearance
+                d = depth * bin_size/2 - clearance
                 path = FilletPolyline((-w, -d), (-w, d), (w, d), (w, -d),
                                       radius=corner_dia/2, close=True)
             
@@ -54,16 +53,16 @@ class GFProfile(BasePartObject):
 class GFProfilePlate(BasePartObject):
     def __init__(self, rotation: tuple[float, float, float] | Rotation = (0, 0, 0), align: Align | tuple[Align, Align, Align] = None, mode: Mode = Mode.ADD):
         with BuildPart() as p:
-            Box(bin_size, bin_size, plate_height + plate_base_height)
+            Box(bin_size, bin_size, plate_height + plate_base_height - 0.1)
             with Locations(faces().filter_by(Plane.XY).sort_by(Axis.Z)[-1].center()):
-                GFProfile(base=plate_base_height, mode=Mode.SUBTRACT, align=(Align.CENTER, Align.CENTER, Align.MAX))
+                GFProfile(clearance=0, inner_clearance=0.1, base=plate_base_height, mode=Mode.SUBTRACT, align=(Align.CENTER, Align.CENTER, Align.MAX))
             
         super().__init__(p.part, rotation, align, mode)
 
 class GFProfileBin(BasePartObject):
     def __init__(self, rotation: tuple[float, float, float] | Rotation = (0, 0, 0), align: Align | tuple[Align, Align, Align] = None, mode: Mode = Mode.ADD):
         with BuildPart() as p:
-            GFProfile(bin_size=41.5, corner_dia=7.5)
+            GFProfile(clearance=0.25, inner_clearance=0, corner_dia=7.5)
         super().__init__(p.part, rotation, align, mode)
 
 class GFProfileLip(BasePartObject):
@@ -79,17 +78,18 @@ class GFProfileLip(BasePartObject):
             extrude(amount=plate_height + support_height + base - shelf_clearance)
 
             with Locations(faces().filter_by(Plane.XY).sort_by(Axis.Z)[-1]):
-                GFProfile(width, depth, bin_size=bin_size,
-                          clearance=bin_clearance,
+                GFProfile(width=width,
+                          depth=depth,
+                          clearance=0,
                           corner_dia=outer_rad*2,
                           support=support_height,
                           base=0.8,
-                          inner_clearance=shelf_clearance,
+                          inner_clearance=0.1,
                           mode=Mode.SUBTRACT,
                           align=(Align.CENTER, Align.CENTER, Align.MAX))
         super().__init__(p.part, rotation, align, mode)
 
 if (__name__ == "__main__"):
-    show_object(GFProfilePlate(), "plate")
-    show_object(GFProfileBin(), "bin")
-    show_object(GFProfileLip(1, 1, support=60), "lip")
+    show_object(GFProfilePlate(), "plate", measure_tools=True)
+    show_object(GFProfileBin(), "bin", measure_tools=True)
+    show_object(GFProfileLip(1, 2, support=60), "lip", measure_tools=True)

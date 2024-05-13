@@ -59,7 +59,9 @@ class LabelShelf(BasePartObject):
         shelf_depth=12
         edge_depth=1.2
         shelf_height = 2
-        depth_from_wall = plate_height_a - shelf_clearance + plate_height_c - wall_thickness
+        lip_height_c = 1.9
+        lip_height_a = 0.7
+        depth_from_wall = lip_height_a + lip_height_c - wall_thickness
         depth = shelf_depth + edge_depth + depth_from_wall
         inner_height = 1
         with BuildPart() as p:
@@ -67,7 +69,7 @@ class LabelShelf(BasePartObject):
             with BuildSketch(Plane(faces().filter_by(Plane.XY).sort_by(Axis.Z)[-1])):
                 with Locations((0, depth/2 - depth_from_wall)):
                     RectangleRounded(len - depth_from_wall*2, shelf_depth,
-                                     outer_rad - plate_height_a - plate_height_c,
+                                     outer_rad - plate_height_a + shelf_clearance - plate_height_c,
                                      align=(Align.CENTER, Align.MAX))
             extrude(amount=-inner_height, mode=Mode.SUBTRACT)
             fillet(edges().filter_by(Axis.X).group_by(Axis.Y)[0].group_by(Axis.Z)[-1], radius=min(shelf_height, edge_depth*0.75))
@@ -142,9 +144,14 @@ class Bin(BasePartObject):
                             mode=Mode.SUBTRACT)
             
             # Round off the top edge because it's too sharp for 3D printing.
-            fillet(edges().group_by(Axis.Z)[-1], radius=0.25)
+            with Locations(bounding_box().faces().filter_by(Plane.XY).sort_by(Axis.Z)[-1].center()):
+                Box(box_width, box_depth, 0.3,
+                    align=(Align.CENTER, Align.CENTER, Align.MAX),
+                    mode=Mode.SUBTRACT)
+            
 
         super().__init__(p.part, rotation, align, mode)
 
-export_step(Bin(2, 1, 4, 12.5, divisions=3), "box.step")
-show_object(Bin(2, 1, 4, 12.5, divisions=3), "test")
+box = Bin(1, 1, 4, 12.5, divisions=1)
+export_step(box, "box.step")
+show_object(box, "test", measure_tools=True)

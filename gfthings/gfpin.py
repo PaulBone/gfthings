@@ -8,7 +8,7 @@ from build123d.topology import Part, Solid
 from ocp_vscode import show, show_object, reset_show, set_port, set_defaults, get_defaults
 set_port(3939)
 
-from parameters import *
+from gfthings.parameters import *
 
 with BuildPart() as p:
     import math
@@ -39,5 +39,7 @@ with BuildPart() as p:
         Box(50, cut_width, cut_len, mode=Mode.SUBTRACT, align=(Align.CENTER, Align.CENTER, Align.MIN))
         Box(cut_width, 50, cut_len, mode=Mode.SUBTRACT, align=(Align.CENTER, Align.CENTER, Align.MIN))
 
-export_step(p.part, "pin.step")
-show(p.part)
+def main():
+    print("Writing pin object to pin.step")
+    export_step(p.part, "pin.step")
+

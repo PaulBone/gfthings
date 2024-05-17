@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "gfthings"
+version = "0.1.0"
+description = "Paul's Gridfinity Things"
+authors = ["Paul Bone <paul@bone.id.au>"]
+license = "CC BY-NC-SA 4.0"
+readme = "README.md"
+packages = [{include = "gfthings"}]
+
+[tool.poetry.scripts]
+gfpin = "gfthings.gfpin:main"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+build123d = "^0.5.0"
+ocp-vscode = "^2.3.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

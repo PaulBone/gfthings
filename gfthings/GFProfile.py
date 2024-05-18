@@ -1,3 +1,5 @@
+# Copyright (C) Paul Bone
+# CC BY-NC-SA 4.0
 
 from build123d import *
 from build123d.build_enums import Align, Mode

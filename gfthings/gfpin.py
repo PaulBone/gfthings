@@ -1,6 +1,8 @@
-#
 # Make a pin for holding a base plate to plywood.
 #
+# Copyright (C) Paul Bone
+#
+# CC BY 4.0
 
 from build123d import *
 from build123d.build_enums import Align, Mode
@@ -42,4 +44,5 @@ with BuildPart() as p:
 def main():
     print("Writing pin object to pin.step")
     export_step(p.part, "pin.step")
+    show_object(p.part)
 

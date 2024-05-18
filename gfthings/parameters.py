@@ -1,3 +1,5 @@
+# Copyright (C) Paul Bone
+# CC BY 4.0
 
 bin_size = 42
 plate_height_a = 0.7

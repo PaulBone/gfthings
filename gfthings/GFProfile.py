@@ -83,7 +83,7 @@ class GFProfileLip(BasePartObject):
                           clearance=0,
                           corner_dia=outer_rad*2,
                           support=support_height,
-                          base=0.8,
+                          base=base,
                           inner_clearance=0.1,
                           mode=Mode.SUBTRACT,
                           align=(Align.CENTER, Align.CENTER, Align.MAX))

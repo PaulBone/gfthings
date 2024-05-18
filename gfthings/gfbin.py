@@ -12,8 +12,8 @@ from ocp_vscode import (show,
                         get_defaults)
 set_port(3939)
 
-from parameters import *
-from GFProfile import GFProfileBin, GFProfileLip
+from gfthings.parameters import *
+from gfthings.GFProfile import GFProfileBin, GFProfileLip
 
 magnet_depth=2.2
 
@@ -187,6 +187,8 @@ class Bin(BasePartObject):
 
         super().__init__(p.part, rotation, align, mode)
 
-box = Bin(1, 1, 4, 12.5, divisions=1)
-export_step(box, "box.step")
-show_object(box, "test", measure_tools=True)
+def main():
+    box = Bin(1, 1, 4, 12.5, shelf=False, divisions=2)
+    export_step(box, "bin.step")
+    # show_object(box, "test", measure_tools=True)
+

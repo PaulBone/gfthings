@@ -9,6 +9,7 @@ packages = [{include = "gfthings"}]
 
 [tool.poetry.scripts]
 gfpin = "gfthings.gfpin:main"
+gfbin = "gfthings.gfbin:main"
 
 [tool.poetry.dependencies]
 python = "^3.10"

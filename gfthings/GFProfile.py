@@ -7,7 +7,7 @@ from build123d.topology import Part, Solid
 from ocp_vscode import show, reset_show, set_port, set_defaults, get_defaults, show_object
 set_port(3939)
 
-from parameters import *
+from gfthings.parameters import *
 
 class GFProfile(BasePartObject):
     def __init__(self, width : float = 1,

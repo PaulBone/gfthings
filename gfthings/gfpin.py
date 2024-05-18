@@ -7,7 +7,14 @@
 from build123d import *
 from build123d.build_enums import Align, Mode
 from build123d.topology import Part, Solid
-from ocp_vscode import show, show_object, reset_show, set_port, set_defaults, get_defaults
+
+from ocp_vscode import (show, 
+                        show_object,
+                        reset_show,
+                        set_port,
+                        set_defaults,
+                        get_defaults)
+
 set_port(3939)
 
 from gfthings.parameters import *
@@ -38,8 +45,12 @@ with BuildPart() as p:
     revolve()
     with Locations((0, 0, -(peg_rad + (outer_shaft - inner_shaft)))):
         cut_len = 3*shaft_len/4 + peg_rad + (outer_shaft - inner_shaft)
-        Box(50, cut_width, cut_len, mode=Mode.SUBTRACT, align=(Align.CENTER, Align.CENTER, Align.MIN))
-        Box(cut_width, 50, cut_len, mode=Mode.SUBTRACT, align=(Align.CENTER, Align.CENTER, Align.MIN))
+        Box(50, cut_width, cut_len, 
+            mode=Mode.SUBTRACT,
+            align=(Align.CENTER, Align.CENTER, Align.MIN))
+        Box(cut_width, 50, cut_len,
+            mode=Mode.SUBTRACT,
+            align=(Align.CENTER, Align.CENTER, Align.MIN))
 
 def main():
     print("Writing pin object to pin.step")

@@ -14,6 +14,7 @@ If you want to modify gfthings then build it with poetry.
 
     sudo apt install pipx
     pipx install poetry
+    poetry add ocp-vscode
     poetry install
 
 If you choose this option then you must prefix your commands with

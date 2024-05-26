@@ -13,7 +13,6 @@ gfpin = "gfthings.gfpin:main"
 [tool.poetry.dependencies]
 python = "^3.10"
 build123d = "^0.5.0"
-ocp-vscode = "^2.3.3"
 
 [build-system]
 requires = ["poetry-core"]

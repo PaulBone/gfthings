@@ -68,7 +68,7 @@ class GFProfileBin(BasePartObject):
         super().__init__(p.part, rotation, align, mode)
 
 class GFProfileLip(BasePartObject):
-    def __init__(self, width : int = 1, depth : int = 1, support : float = 60, base : float = 0.8, shelf_clearance : float = 0.1,
+    def __init__(self, width : int = 1, depth : int = 1, support : float = 45, base : float = 0.8, shelf_clearance : float = 0.1,
                  rotation: tuple[float, float, float] | Rotation = (0, 0, 0), align: Align | tuple[Align, Align, Align] = None, mode: Mode = Mode.ADD):
         import math
         support_height = (plate_height_a + plate_height_c) / math.tan(support*math.pi/180.0)

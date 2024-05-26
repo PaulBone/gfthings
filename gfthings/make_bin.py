@@ -59,7 +59,7 @@ class BinLip(BasePartObject):
                  align: Align | tuple[Align, Align, Align] = None,
                  mode: Mode = Mode.ADD):
         with BuildPart() as p:
-            GFProfileLip(width, depth, support=max_overhang_angle,
+            GFProfileLip(width, depth, support=45,
                          base=0.8, shelf_clearance=shelf_clearance)
 
         super().__init__(p.part, rotation, align, mode)

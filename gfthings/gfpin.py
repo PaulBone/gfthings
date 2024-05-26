@@ -4,56 +4,37 @@
 #
 # CC BY 4.0
 
+from argparse import ArgumentParser
 from build123d import *
-from build123d.build_enums import Align, Mode
-from build123d.topology import Part, Solid
 
-from ocp_vscode import (show, 
-                        show_object,
-                        reset_show,
-                        set_port,
-                        set_defaults,
-                        get_defaults)
+from gfthings.Pin import Pin
 
-set_port(3939)
+def main(argv: list[str] | None = None):
+    parser = ArgumentParser(
+        description="Generate a pin for attaching things to plywood")
+    parser.add_argument(
+        "--vscode",
+        help="Run in vscode_ocp mode and connect to the given port. " +
+             "Do not produce a .step file.",
+        default=0)
+    parser.add_argument(
+        "-o",
+        "--output",
+        help="Output filename, defaults to `%(default)s",
+        default="pin.step")
 
-from gfthings.parameters import *
+    args = parser.parse_args(argv)
 
-with BuildPart() as p:
-    import math
+    pin = Pin()
 
-    total_height = 3.2 + plate_base_height + 0.5
-    shaft_len = total_height - (magnet_dia - screw_dia)/2
-    inner_shaft = 1.0
-    outer_shaft = 1.7
-    peg_rad = 0.5
-    cut_width = 0.8
-    
-    with BuildSketch(Plane.XZ):
-        with BuildLine() as f:
-            
-            Polyline((inner_shaft, -(outer_shaft - inner_shaft)),
-                     (outer_shaft + peg_rad, peg_rad), 
-                     (outer_shaft, peg_rad + math.tan(20*math.pi/180)*peg_rad),
-                     (outer_shaft, peg_rad + shaft_len),
-                     (magnet_dia/2-0.2, peg_rad + total_height),
-                     (0, peg_rad + total_height),
-                     (0, peg_rad + shaft_len),
-                     (inner_shaft, peg_rad + shaft_len),
-                     (inner_shaft, -(outer_shaft - inner_shaft)))
-        make_face()
-    revolve()
-    with Locations((0, 0, -(peg_rad + (outer_shaft - inner_shaft)))):
-        cut_len = 3*shaft_len/4 + peg_rad + (outer_shaft - inner_shaft)
-        Box(50, cut_width, cut_len, 
-            mode=Mode.SUBTRACT,
-            align=(Align.CENTER, Align.CENTER, Align.MIN))
-        Box(cut_width, 50, cut_len,
-            mode=Mode.SUBTRACT,
-            align=(Align.CENTER, Align.CENTER, Align.MIN))
+    if args.vscode:
+        from ocp_vscode import (show_object,
+                                set_port)
+        set_port(args.vscode)
+        show_object(pin)
+    else:
+        export_step(pin, args.output)
 
-def main():
-    print("Writing pin object to pin.step")
-    export_step(p.part, "pin.step")
-    show_object(p.part)
-
+if __name__ == "__main__":
+    import sys
+    main(sys.argv[1:])

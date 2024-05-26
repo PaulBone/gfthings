@@ -151,7 +151,7 @@ class Bin(BasePartObject):
                     with GridLocations(dividor_space, 1, dividors, 1):
                         # Use inner_height if there's no shelf, otherwise
                         # subtract the shelf's cuttout depth.
-                        Box(wall_thickness, inner_depth, inner_height - 2,
+                        Box(wall_thickness, inner_depth, inner_height - 1.1,
                             align=(Align.CENTER, Align.MIN, Align.MIN))
 
             if scoop_rad and scoop_rad > 0:

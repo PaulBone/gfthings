@@ -71,7 +71,7 @@ class GFProfileLip(BasePartObject):
     def __init__(self, width : int = 1, depth : int = 1, support : float = 60, base : float = 0.8, shelf_clearance : float = 0.1,
                  rotation: tuple[float, float, float] | Rotation = (0, 0, 0), align: Align | tuple[Align, Align, Align] = None, mode: Mode = Mode.ADD):
         import math
-        support_height = math.tan(support*math.pi/180.0) / (plate_height_a + plate_height_c)
+        support_height = (plate_height_a + plate_height_c) / math.tan(support*math.pi/180.0)
         with BuildPart() as p:
             with BuildSketch(Plane.XY):
                 RectangleRounded(width * bin_size - bin_clearance*2,

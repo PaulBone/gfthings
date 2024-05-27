@@ -28,8 +28,21 @@ https://creativecommons.org/licenses/by-nc-sa/4.0/
 Bins
 ----
 
-TODO.
+Bins are gridfinity bins.  They are inspired by
+[Pred's bins](https://www.printables.com/model/592545-gridfinity-bin-with-printable-label-by-pred-parame)
+and include the same label shelf.
+They are easy to print (overhangs and bridges are minimised) and can be
+generated in a mumber of custom sizes with and without dividers.  For more
+information see:
 
+    gfbin -h
+
+To make labels for these bins we suggest
+[gflabel](https://github.com/ndevenish/gflabel)
+and choose pred style labels.
+
+![](images/bin-render.png)
+![](images/bin-irl.jpeg)
 
 Pins
 ----

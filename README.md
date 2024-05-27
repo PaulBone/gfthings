@@ -3,7 +3,12 @@ Paul's Gridfinity Things
 ========================
 
 This Python program will generate several different kinds of gridfinity
-compatible objects for 3D printing
+compatible objects for 3D printing.
+Gridfinity is an open source storage system best introduced
+[in this video](https://www.youtube.com/watch?v=ra_9zU-mnl8) and then this
+[diagram](https://gridfinity.xyz/specification/).
+Look on [thangs](thangs.com) and 
+[printables](printables.com) for more compatible parts.
 
 Setup, You can install with pipx.
 

@@ -67,6 +67,7 @@ class BinLip(BasePartObject):
 class LabelShelf(BasePartObject):
     def __init__(self, len : float,
                  shelf_clearance : float,
+                 shelf_overhang_angle : float = 60,
                  rotation: tuple[float, float, float] | Rotation = (0, 0, 0),
                  align: Align | tuple[Align, Align, Align] = None,
                  mode: Mode = Mode.ADD):
@@ -91,21 +92,23 @@ class LabelShelf(BasePartObject):
             fillet(edges().filter_by(Axis.X).group_by(Axis.Y)[0]
                         .group_by(Axis.Z)[-1],
                    radius=min(shelf_height, edge_depth*0.75))
-            with BuildSketch(Plane(
-                    origin=edges().filter_by(Axis.Y).group_by(Axis.Z)[0]
-                        .sort_by(Axis.X)[0]@1,
-                    x_dir=(0, 1, 0),
-                    z_dir=(1, 0, 0))):
+            
+            if shelf_overhang_angle < 90:
                 import math
                 support_height = depth / \
-                        math.tan(max_overhang_angle * math.pi / 180.0)
-                with BuildLine():
-                    Polyline((0, 0),
-                             (0, -support_height),
-                             (-depth, 0),
-                             close=True)
-                make_face()
-            extrude(amount=len)
+                        math.tan(shelf_overhang_angle * math.pi / 180.0)
+                with BuildSketch(Plane(
+                        origin=edges().filter_by(Axis.Y).group_by(Axis.Z)[0]
+                            .sort_by(Axis.X)[0]@1,
+                        x_dir=(0, 1, 0),
+                        z_dir=(1, 0, 0))):
+                    with BuildLine():
+                        Polyline((0, 0),
+                                 (0, -support_height),
+                                 (-depth, 0),
+                                 close=True)
+                    make_face()
+                extrude(amount=len)
             
         super().__init__(p.part, rotation, align, mode)
 

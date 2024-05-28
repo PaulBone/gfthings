@@ -101,6 +101,28 @@ class BaseGrid(BasePartObject):
                    all_z_edges.group_by(Axis.X)[-1].group_by(Axis.Y)[-1],
                    radius=outer_rad)
 
+            clip_edge_height = -(plate_height + plate_base_height)/2 + 4.7
+            with Locations((-(bin_size * x)/2, 0, clip_edge_height)):
+                with GridLocations(bin_size, bin_size, 1, y):
+                    ClipEdge(edge_cut_len,
+                             rotation=(0, 0, 0),
+                             align=(Align.MIN, Align.CENTER, Align.MAX))
+            with Locations(((bin_size*x)/2, 0, clip_edge_height)):
+                with GridLocations(bin_size, bin_size, 1, y):
+                    ClipEdge(edge_cut_len,
+                             rotation=(0, 0, 180),
+                             align=(Align.MIN, Align.CENTER, Align.MAX))
+            with Locations((0, -(bin_size*y)/2, clip_edge_height)):
+                with GridLocations(bin_size, bin_size, x, 1):
+                    ClipEdge(edge_cut_len,
+                             rotation=(0, 0, 90),
+                             align=(Align.MIN, Align.CENTER, Align.MAX))
+            with Locations((0, (bin_size*y)/2, clip_edge_height)):
+                with GridLocations(bin_size, bin_size, x, 1):
+                    ClipEdge(edge_cut_len,
+                             rotation=(0, 0, 270),
+                             align=(Align.MIN, Align.CENTER, Align.MAX))
+
         super().__init__(p.part, rotation, align, mode)
 
 class ClipEdge(BasePartObject):

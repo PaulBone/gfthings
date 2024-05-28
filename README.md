@@ -49,6 +49,20 @@ and choose pred style labels.
 ![](images/bin-render.png)
 ![](images/bin-irl.jpeg)
 
+
+Bases
+-----
+
+A minimal gridfinity base.  This is a remix of
+https://www.printables.com/model/608500-gridfinity-base-light-magnetic-connectable-paramet
+with paramertised dimensions.  Try:
+
+    gfbase -h
+    gfbase -x 4 -y 3 -o base.step
+
+To connect bases made with gfbase use the clips found
+[https://www.printables.com/model/608500-gridfinity-base-light-magnetic-connectable-paramet/files](on the original model).
+
 Pins
 ----
 

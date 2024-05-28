@@ -146,3 +146,9 @@ class ClipEdge(BasePartObject):
         
         super().__init__(p.part, rotation, align, mode)
 
+if __name__ == "__main__":
+    from ocp_vscode import show_object, set_port
+    set_port(3939)
+
+    show_object(BaseGrid(2, 2), "Screw support")
+    

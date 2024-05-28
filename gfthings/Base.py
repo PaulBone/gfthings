@@ -23,8 +23,6 @@ class ScrewSupport(BasePartObject):
                 with Locations((offset, offset)):
                     Hole(radius=screw_dia/2)
                     Hole(radius=magnet_dia/2, depth=2)
-            fillet(edges().filter_by(Plane.XY).group_by(Axis.Z)[-1],
-                   radius=0.25)
         super().__init__(p.part, rotation, align, mode)
 
 class EdgeCut(BasePartObject):

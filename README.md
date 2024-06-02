@@ -60,8 +60,20 @@ with paramertised dimensions.  Try:
     gfbase -h
     gfbase -x 4 -y 3 -o base.step
 
+![](images/base-4x3.png)
+
 To connect bases made with gfbase use the clips found
 [https://www.printables.com/model/608500-gridfinity-base-light-magnetic-connectable-paramet/files](on the original model).
+
+You can customise the screw holes, By default counterbored holes that can
+take a magnet, screw or pin (below) are generated.  you can change the screw
+diameter, magnet diameter and magnet depth.
+
+    gfbase --magnet-diameter 6.1 \
+           --screw-diameter 4 \
+           --magnet-depth 2
+
+![](images/base-counterbore.png)
 
 Pins
 ----

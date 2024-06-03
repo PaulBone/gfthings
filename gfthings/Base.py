@@ -81,31 +81,52 @@ class BaseSquare(BasePartObject):
                  magnet_depth : float = 2,
                  screw_rad : float = 2,
                  counter_sink : bool = False,
+                 screw_hole_count : int = 2,
                  rotation: tuple[float, float, float] | Rotation = (0, 0, 0),
                  align: Align | tuple[Align, Align, Align] = None,
                  mode: Mode = Mode.ADD):
         with BuildPart() as p:
             GFProfilePlate()
 
-            with Locations(
-                    vertices().group_by(Axis.Z)[0].group_by(Axis.X)[0].
-                    sort_by(Axis.Y)[0]):
-                ScrewSupport(magnet_rad=magnet_rad,
-                             magnet_depth=magnet_depth,
-                             screw_rad=screw_rad,
-                             counter_sink=counter_sink,
-                             align=(Align.MIN, Align.MIN, Align.MIN))
-                #fillet(edges(Select.NEW).filter_by(Axis.Z), radius=screw_support_fillet/3)
-                
-            with Locations(
-                    vertices().group_by(Axis.Z)[0].group_by(Axis.X)[-1].
-                    sort_by(Axis.Y)[-1]):
-                ScrewSupport(magnet_rad=magnet_rad,
-                             magnet_depth=magnet_depth,
-                             screw_rad=screw_rad,
-                             counter_sink=counter_sink,
-                             align=(Align.MIN, Align.MIN, Align.MIN),
-                             rotation=(0, 0, 180))
+            if screw_hole_count >= 2:
+                with Locations(
+                        vertices().group_by(Axis.Z)[0].group_by(Axis.X)[0].
+                        sort_by(Axis.Y)[0]):
+                    ScrewSupport(magnet_rad=magnet_rad,
+                                magnet_depth=magnet_depth,
+                                screw_rad=screw_rad,
+                                counter_sink=counter_sink,
+                                align=(Align.MIN, Align.MIN, Align.MIN))
+                    
+                with Locations(
+                        vertices().group_by(Axis.Z)[0].group_by(Axis.X)[-1].
+                        sort_by(Axis.Y)[-1]):
+                    ScrewSupport(magnet_rad=magnet_rad,
+                                magnet_depth=magnet_depth,
+                                screw_rad=screw_rad,
+                                counter_sink=counter_sink,
+                                align=(Align.MIN, Align.MIN, Align.MIN),
+                                rotation=(0, 0, 180))
+
+            if screw_hole_count >= 4:
+                with Locations(
+                        vertices().group_by(Axis.Z)[0].group_by(Axis.X)[-1].
+                        sort_by(Axis.Y)[0]):
+                    ScrewSupport(magnet_rad=magnet_rad,
+                                magnet_depth=magnet_depth,
+                                screw_rad=screw_rad,
+                                counter_sink=counter_sink,
+                                align=(Align.MIN, Align.MIN, Align.MIN),
+                                rotation=(0, 0, 90))
+                with Locations(
+                        vertices().group_by(Axis.Z)[0].group_by(Axis.X)[0].
+                        sort_by(Axis.Y)[-1]):
+                    ScrewSupport(magnet_rad=magnet_rad,
+                                magnet_depth=magnet_depth,
+                                screw_rad=screw_rad,
+                                counter_sink=counter_sink,
+                                align=(Align.MIN, Align.MIN, Align.MIN),
+                                rotation=(0, 0, 270))
 
             with Locations(faces().filter_by(Plane.YZ).sort_by(Axis.X)[0],
                         faces().filter_by(Plane.YZ).sort_by(Axis.X)[-1],
@@ -124,6 +145,7 @@ class BaseGrid(BasePartObject):
                  magnet_depth : float = 2,
                  screw_rad : float = 2,
                  counter_sink : bool = False,
+                 screw_hole_count : int = 2,
                  rotation: tuple[float, float, float] | Rotation = (0, 0, 0),
                  align: Align | tuple[Align, Align, Align] = None,
                  mode: Mode = Mode.ADD):
@@ -132,6 +154,7 @@ class BaseGrid(BasePartObject):
                 BaseSquare(magnet_rad=magnet_rad,
                            magnet_depth=magnet_depth,
                            screw_rad=screw_rad,
+                           screw_hole_count=screw_hole_count,
                            counter_sink=counter_sink)
             all_z_edges = edges().filter_by(Axis.Z)
             fillet(all_z_edges.group_by(Axis.X)[0].group_by(Axis.Y)[0] +

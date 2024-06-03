@@ -75,6 +75,17 @@ diameter, magnet diameter and magnet depth.
 
 ![](images/base-counterbore.png)
 
+By default there are two screw/magnet holes per square.  But to save plastic
+or printing time generate a minimal baseplate with
+
+    --screw-hole-count 0
+
+Other valid options are 2 and 4.
+
+![](images/base-screws0.png)
+![](images/base-screws2.png)
+![](images/base-screws4.png)
+
 Pins
 ----
 

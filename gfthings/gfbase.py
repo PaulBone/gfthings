@@ -43,11 +43,19 @@ def main(argv: list[str] | None = None):
         help="Depth of magnet hole (default %(default)s",
         default=2,
         type=float)
+    
     # I haven't tested prints with these yet.
     #parser.add_argument(
     #    "--countersink",
     #    help="Countersink the screw holes rather than counterbore",
     #    action="store_true")
+    
+    parser.add_argument(
+        "--screw-hole-count",
+        help="The number of screw holes in each grid square, 0, 2 or 4" +
+        "(default %(default)s",
+        default=2,
+        type=int)
     
     args = parser.parse_args(argv)
 
@@ -62,7 +70,8 @@ def main(argv: list[str] | None = None):
                     screw_rad=screw_rad,
                     magnet_rad=magnet_rad,
                     magnet_depth=magnet_depth,
-                    counter_sink=counter_sink)
+                    counter_sink=counter_sink,
+                    screw_hole_count=args.screw_hole_count)
 
     if args.vscode:
         from ocp_vscode import show, set_port

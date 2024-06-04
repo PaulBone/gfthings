@@ -21,6 +21,11 @@ def main(argv: list[str] | None = None):
         help="Output filename, defaults to %(default)s",
         default="base.step")
     parser.add_argument(
+        "--loop",
+        help="Run in loop mode, generate many base files for different "
+        "configurations",
+        action="store_true") 
+    parser.add_argument(
         "-x",
         help="Number of squares across (default: %(default)s",
         default=4)
@@ -59,26 +64,36 @@ def main(argv: list[str] | None = None):
     
     args = parser.parse_args(argv)
 
-    x = int(args.x)
-    y = int(args.y)
-    screw_rad = args.screw_diameter/2
-    magnet_rad = args.magnet_diameter/2
-    magnet_depth = args.magnet_depth
-    #counter_sink = bool(args.countersink)
-    counter_sink = False
-    base = BaseGrid(x, y,
-                    screw_rad=screw_rad,
-                    magnet_rad=magnet_rad,
-                    magnet_depth=magnet_depth,
-                    counter_sink=counter_sink,
-                    screw_hole_count=args.screw_hole_count)
+    if args.loop:
+        for x in range(1, 6):
+            for y in range(1, 6):
+                for screw_count in [0, 2, 4]:
+                    file = f"base-{x}x{y}-s{screw_count}.step"
+                    print(f"Writing {file}")
+                    base = BaseGrid(x, y, screw_hole_count=screw_count)
+                    export_step(base, file)
 
-    if args.vscode:
-        from ocp_vscode import show, set_port
-        set_port(args.vscode)
-        show(base)
     else:
-        export_step(base, args.output)
+        x = int(args.x)
+        y = int(args.y)
+        screw_rad = args.screw_diameter/2
+        magnet_rad = args.magnet_diameter/2
+        magnet_depth = args.magnet_depth
+        #counter_sink = bool(args.countersink)
+        counter_sink = False
+        base = BaseGrid(x, y,
+                        screw_rad=screw_rad,
+                        magnet_rad=magnet_rad,
+                        magnet_depth=magnet_depth,
+                        counter_sink=counter_sink,
+                        screw_hole_count=args.screw_hole_count)
+
+        if args.vscode:
+            from ocp_vscode import show, set_port
+            set_port(args.vscode)
+            show(base)
+        else:
+            export_step(base, args.output)
 
 if __name__ == "__main__":
     import sys

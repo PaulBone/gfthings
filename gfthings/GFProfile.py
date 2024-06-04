@@ -57,7 +57,7 @@ class GFProfilePlate(BasePartObject):
         with BuildPart() as p:
             Box(bin_size, bin_size, plate_height + plate_base_height - 0.1)
             with Locations(faces().filter_by(Plane.XY).sort_by(Axis.Z)[-1].center()):
-                GFProfile(clearance=0, inner_clearance=0.1, base=plate_base_height, mode=Mode.SUBTRACT, align=(Align.CENTER, Align.CENTER, Align.MAX))
+                GFProfile(clearance=0, inner_clearance=0, base=plate_base_height, mode=Mode.SUBTRACT, align=(Align.CENTER, Align.CENTER, Align.MAX))
             
         super().__init__(p.part, rotation, align, mode)
 

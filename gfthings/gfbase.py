@@ -61,6 +61,11 @@ def main(argv: list[str] | None = None):
         "(default %(default)s",
         default=2,
         type=int)
+    parser.add_argument(
+        "--screw-hole-pattern-drawer",
+        help="Place four screw holes (in addition to --screw-hole-count) " +
+        "in a minimal pattern for installation into drawers. ",
+        action="store_true")
     
     args = parser.parse_args(argv)
 
@@ -86,7 +91,8 @@ def main(argv: list[str] | None = None):
                         magnet_rad=magnet_rad,
                         magnet_depth=magnet_depth,
                         counter_sink=counter_sink,
-                        screw_hole_count=args.screw_hole_count)
+                        screw_hole_count=args.screw_hole_count,
+                        screw_hole_pattern_drawer=args.screw_hole_pattern_drawer)
 
         if args.vscode:
             from ocp_vscode import show, set_port

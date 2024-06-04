@@ -86,6 +86,17 @@ Other valid options are 2 and 4.
 ![](images/base-screws2.png)
 ![](images/base-screws4.png)
 
+Finally there's a "screw hole pattern for drawers" option:
+
+    --screw-hole-pattern-drawer
+
+This places exactly 4 screw holes in the corners but not-too-near the
+corners (clearance for my drill).  Which is suitable if you need to mount
+the base but don't need to provide magnets or iron screws for magnets in the
+boxes.
+
+![](images/base-screws-drawer.png)
+
 Pins
 ----
 

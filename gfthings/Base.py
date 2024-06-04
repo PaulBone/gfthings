@@ -143,22 +143,63 @@ class BaseSquare(BasePartObject):
         super().__init__(p.part, rotation, align, mode)
 
 class BaseGrid(BasePartObject):
-    def __init__(self, x, y,
+    def __init__(self, x_num, y_num,
                  magnet_rad : float = 3.1,
                  magnet_depth : float = 2,
                  screw_rad : float = 2,
                  counter_sink : bool = False,
                  screw_hole_count : int = 2,
+                 screw_hole_pattern_drawer : bool = False,
+                 corner_screw_hole_count : int = 0,
                  rotation: tuple[float, float, float] | Rotation = (0, 0, 0),
                  align: Align | tuple[Align, Align, Align] = None,
                  mode: Mode = Mode.ADD):
         with BuildPart() as p:
-            with GridLocations(bin_size, bin_size, x, y):
+            with GridLocations(bin_size, bin_size, x_num, y_num):
                 BaseSquare(magnet_rad=magnet_rad,
-                           magnet_depth=magnet_depth,
-                           screw_rad=screw_rad,
-                           screw_hole_count=screw_hole_count,
-                           counter_sink=counter_sink)
+                    magnet_depth=magnet_depth,
+                    screw_rad=screw_rad,
+                    screw_hole_count=screw_hole_count,
+                    counter_sink=counter_sink)
+
+            if screw_hole_pattern_drawer and x_num > 2 and y_num > 2:
+                with Locations(faces().filter_by(Plane.XY).sort_by(Axis.Z)[0].center()):
+                    with Locations((-(bin_size * x_num)/2+bin_size, 
+                                    -(bin_size * y_num)/2+bin_size, 
+                                    0)):
+                        ScrewSupport(magnet_rad=magnet_rad,
+                                    magnet_depth=magnet_depth,
+                                    screw_rad=screw_rad,
+                                    counter_sink=counter_sink,
+                                    align=(Align.MIN, Align.MIN, Align.MIN))
+                    with Locations((-(bin_size * x_num)/2+bin_size,
+                                    (bin_size * y_num)/2-bin_size,
+                                    0)):
+                        ScrewSupport(magnet_rad=magnet_rad,
+                                    magnet_depth=magnet_depth,
+                                    screw_rad=screw_rad,
+                                    counter_sink=counter_sink,
+                                    rotation=(0, 0, 270),
+                                    align=(Align.MIN, Align.MIN, Align.MIN))
+                    with Locations(((bin_size * x_num)/2-bin_size,
+                                    (bin_size * y_num)/2-bin_size,
+                                    0)):
+                        ScrewSupport(magnet_rad=magnet_rad,
+                                    magnet_depth=magnet_depth,
+                                    screw_rad=screw_rad,
+                                    counter_sink=counter_sink,
+                                    rotation=(0, 0, 180),
+                                    align=(Align.MIN, Align.MIN, Align.MIN))
+                    with Locations(((bin_size * x_num)/2-bin_size,
+                                    -(bin_size * y_num)/2+bin_size,
+                                    0)):
+                        ScrewSupport(magnet_rad=magnet_rad,
+                                    magnet_depth=magnet_depth,
+                                    screw_rad=screw_rad,
+                                    counter_sink=counter_sink,
+                                    rotation=(0, 0, 90),
+                                    align=(Align.MIN, Align.MIN, Align.MIN))
+
             all_z_edges = edges().filter_by(Axis.Z)
             fillet(all_z_edges.group_by(Axis.X)[0].group_by(Axis.Y)[0] +
                    all_z_edges.group_by(Axis.X)[0].group_by(Axis.Y)[-1] +
@@ -167,23 +208,23 @@ class BaseGrid(BasePartObject):
                    radius=outer_rad)
 
             clip_edge_height = -(plate_height + plate_base_height)/2 + 4.7
-            with Locations((-(bin_size * x)/2, 0, clip_edge_height)):
-                with GridLocations(bin_size, bin_size, 1, y):
+            with Locations((-(bin_size * x_num)/2, 0, clip_edge_height)):
+                with GridLocations(bin_size, bin_size, 1, y_num):
                     ClipEdge(edge_cut_len,
                              rotation=(0, 0, 0),
                              align=(Align.MIN, Align.CENTER, Align.MAX))
-            with Locations(((bin_size*x)/2, 0, clip_edge_height)):
-                with GridLocations(bin_size, bin_size, 1, y):
+            with Locations(((bin_size*x_num)/2, 0, clip_edge_height)):
+                with GridLocations(bin_size, bin_size, 1, y_num):
                     ClipEdge(edge_cut_len,
                              rotation=(0, 0, 180),
                              align=(Align.MIN, Align.CENTER, Align.MAX))
-            with Locations((0, -(bin_size*y)/2, clip_edge_height)):
-                with GridLocations(bin_size, bin_size, x, 1):
+            with Locations((0, -(bin_size*y_num)/2, clip_edge_height)):
+                with GridLocations(bin_size, bin_size, x_num, 1):
                     ClipEdge(edge_cut_len,
                              rotation=(0, 0, 90),
                              align=(Align.MIN, Align.CENTER, Align.MAX))
-            with Locations((0, (bin_size*y)/2, clip_edge_height)):
-                with GridLocations(bin_size, bin_size, x, 1):
+            with Locations((0, (bin_size*y_num)/2, clip_edge_height)):
+                with GridLocations(bin_size, bin_size, x_num, 1):
                     ClipEdge(edge_cut_len,
                              rotation=(0, 0, 270),
                              align=(Align.MIN, Align.CENTER, Align.MAX))
@@ -217,5 +258,8 @@ if __name__ == "__main__":
     from ocp_vscode import show_object, set_port
     set_port(3939)
 
-    show_object(BaseGrid(2, 2), "Screw support")
+    show_object(BaseGrid(4, 4, 
+                         screw_hole_count=0,
+                         screw_hole_pattern_drawer=True),
+                "Test")
     

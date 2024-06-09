@@ -23,7 +23,9 @@ class ScrewSupport(BasePartObject):
 
         with BuildPart() as p:
             len = screw_offset + margin
-            Box(len, len, plate_base_height)
+            # These were a bit too tall until I took 0.1mm off.
+            height = plate_base_height - 0.1
+            Box(len, len, height)
             with Locations(faces().filter_by(Plane.XY).sort_by(Axis.Z)[-1]):
                 offset = screw_offset - len/2
                 with Locations((offset, offset)):
@@ -33,11 +35,11 @@ class ScrewSupport(BasePartObject):
                         CounterBoreHole(screw_rad, magnet_rad, magnet_depth)
             minor_len = plate_height_a + plate_height_c
             with Locations((-len/2, -len/2)):
-                Box(minor_len, len + margin, plate_base_height,
+                Box(minor_len, len + margin, height,
                     align=(Align.MAX, Align.MIN, Align.CENTER))
-                Box(len + margin, minor_len, plate_base_height,
+                Box(len + margin, minor_len, height,
                     align=(Align.MIN, Align.MAX, Align.CENTER))
-                Box(minor_len, minor_len, plate_base_height,
+                Box(minor_len, minor_len, height,
                     align=(Align.MAX, Align.MAX, Align.CENTER))
 
             fillet(edges().filter_by(Axis.Z).group_by(Axis.Y)[-2].sort_by(Axis.X)[1],
@@ -55,20 +57,21 @@ class EdgeCut(BasePartObject):
                  mode: Mode = Mode.ADD):
         with BuildPart() as p:
             import math
-            tri_len = math.tan(30.0 * math.pi/180.0)*plate_height
+            # I'm not sure where the 0.05 fudge factor comes from but it seems to work.
+            cutout_height = plate_height + 0.05
+            tri_len = math.tan(30.0 * math.pi/180.0)*cutout_height
             cutout_short_len = cutout_long_len - tri_len*2
-
             with Locations((0, 0, -3)):
                 with BuildSketch(Plane.XY):
-                    Rectangle(cutout_short_len, plate_height)
+                    Rectangle(cutout_short_len, cutout_height)
                     with Locations(
                             edges().filter_by(Axis.Y).sort_by(Axis.X)[0]@0.5):
-                        Triangle(a=plate_height, b=tri_len, C=90,
+                        Triangle(a=cutout_height, b=tri_len, C=90,
                                  align=(Align.CENTER, Align.MIN),
                                  rotation=90)
                     with Locations(
                             edges().filter_by(Axis.Y).sort_by(Axis.X)[-1]@0.5):
-                        Triangle(a=tri_len, b=plate_height, C=90,
+                        Triangle(a=tri_len, b=cutout_height, C=90,
                                  align=(Align.MAX, Align.CENTER),
                                  rotation=180)
             extrude(amount=6)
@@ -140,22 +143,63 @@ class BaseSquare(BasePartObject):
         super().__init__(p.part, rotation, align, mode)
 
 class BaseGrid(BasePartObject):
-    def __init__(self, x, y,
+    def __init__(self, x_num, y_num,
                  magnet_rad : float = 3.1,
                  magnet_depth : float = 2,
                  screw_rad : float = 2,
                  counter_sink : bool = False,
                  screw_hole_count : int = 2,
+                 screw_hole_pattern_drawer : bool = False,
+                 corner_screw_hole_count : int = 0,
                  rotation: tuple[float, float, float] | Rotation = (0, 0, 0),
                  align: Align | tuple[Align, Align, Align] = None,
                  mode: Mode = Mode.ADD):
         with BuildPart() as p:
-            with GridLocations(bin_size, bin_size, x, y):
+            with GridLocations(bin_size, bin_size, x_num, y_num):
                 BaseSquare(magnet_rad=magnet_rad,
-                           magnet_depth=magnet_depth,
-                           screw_rad=screw_rad,
-                           screw_hole_count=screw_hole_count,
-                           counter_sink=counter_sink)
+                    magnet_depth=magnet_depth,
+                    screw_rad=screw_rad,
+                    screw_hole_count=screw_hole_count,
+                    counter_sink=counter_sink)
+
+            if screw_hole_pattern_drawer and x_num > 2 and y_num > 2:
+                with Locations(faces().filter_by(Plane.XY).sort_by(Axis.Z)[0].center()):
+                    with Locations((-(bin_size * x_num)/2+bin_size, 
+                                    -(bin_size * y_num)/2+bin_size, 
+                                    0)):
+                        ScrewSupport(magnet_rad=magnet_rad,
+                                    magnet_depth=magnet_depth,
+                                    screw_rad=screw_rad,
+                                    counter_sink=counter_sink,
+                                    align=(Align.MIN, Align.MIN, Align.MIN))
+                    with Locations((-(bin_size * x_num)/2+bin_size,
+                                    (bin_size * y_num)/2-bin_size,
+                                    0)):
+                        ScrewSupport(magnet_rad=magnet_rad,
+                                    magnet_depth=magnet_depth,
+                                    screw_rad=screw_rad,
+                                    counter_sink=counter_sink,
+                                    rotation=(0, 0, 270),
+                                    align=(Align.MIN, Align.MIN, Align.MIN))
+                    with Locations(((bin_size * x_num)/2-bin_size,
+                                    (bin_size * y_num)/2-bin_size,
+                                    0)):
+                        ScrewSupport(magnet_rad=magnet_rad,
+                                    magnet_depth=magnet_depth,
+                                    screw_rad=screw_rad,
+                                    counter_sink=counter_sink,
+                                    rotation=(0, 0, 180),
+                                    align=(Align.MIN, Align.MIN, Align.MIN))
+                    with Locations(((bin_size * x_num)/2-bin_size,
+                                    -(bin_size * y_num)/2+bin_size,
+                                    0)):
+                        ScrewSupport(magnet_rad=magnet_rad,
+                                    magnet_depth=magnet_depth,
+                                    screw_rad=screw_rad,
+                                    counter_sink=counter_sink,
+                                    rotation=(0, 0, 90),
+                                    align=(Align.MIN, Align.MIN, Align.MIN))
+
             all_z_edges = edges().filter_by(Axis.Z)
             fillet(all_z_edges.group_by(Axis.X)[0].group_by(Axis.Y)[0] +
                    all_z_edges.group_by(Axis.X)[0].group_by(Axis.Y)[-1] +
@@ -164,23 +208,23 @@ class BaseGrid(BasePartObject):
                    radius=outer_rad)
 
             clip_edge_height = -(plate_height + plate_base_height)/2 + 4.7
-            with Locations((-(bin_size * x)/2, 0, clip_edge_height)):
-                with GridLocations(bin_size, bin_size, 1, y):
+            with Locations((-(bin_size * x_num)/2, 0, clip_edge_height)):
+                with GridLocations(bin_size, bin_size, 1, y_num):
                     ClipEdge(edge_cut_len,
                              rotation=(0, 0, 0),
                              align=(Align.MIN, Align.CENTER, Align.MAX))
-            with Locations(((bin_size*x)/2, 0, clip_edge_height)):
-                with GridLocations(bin_size, bin_size, 1, y):
+            with Locations(((bin_size*x_num)/2, 0, clip_edge_height)):
+                with GridLocations(bin_size, bin_size, 1, y_num):
                     ClipEdge(edge_cut_len,
                              rotation=(0, 0, 180),
                              align=(Align.MIN, Align.CENTER, Align.MAX))
-            with Locations((0, -(bin_size*y)/2, clip_edge_height)):
-                with GridLocations(bin_size, bin_size, x, 1):
+            with Locations((0, -(bin_size*y_num)/2, clip_edge_height)):
+                with GridLocations(bin_size, bin_size, x_num, 1):
                     ClipEdge(edge_cut_len,
                              rotation=(0, 0, 90),
                              align=(Align.MIN, Align.CENTER, Align.MAX))
-            with Locations((0, (bin_size*y)/2, clip_edge_height)):
-                with GridLocations(bin_size, bin_size, x, 1):
+            with Locations((0, (bin_size*y_num)/2, clip_edge_height)):
+                with GridLocations(bin_size, bin_size, x_num, 1):
                     ClipEdge(edge_cut_len,
                              rotation=(0, 0, 270),
                              align=(Align.MIN, Align.CENTER, Align.MAX))
@@ -214,5 +258,8 @@ if __name__ == "__main__":
     from ocp_vscode import show_object, set_port
     set_port(3939)
 
-    show_object(BaseGrid(2, 2), "Screw support")
+    show_object(BaseGrid(4, 4, 
+                         screw_hole_count=0,
+                         screw_hole_pattern_drawer=True),
+                "Test")
     

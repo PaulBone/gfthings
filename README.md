@@ -64,6 +64,12 @@ with paramertised dimensions.  Try:
 
 To connect bases made with gfbase use the clips found
 [https://www.printables.com/model/608500-gridfinity-base-light-magnetic-connectable-paramet/files](on the original model).
+Mulitple bases can be connected to fill the bottom of a drawer.
+For example this drawer has two 4x3 and two 4x4 bases connected.  It also
+has some edge pieces (comming soon) that prevent the base from sliding
+around.
+
+![](images/base-irl.jpg)
 
 You can customise the screw holes, By default counterbored holes that can
 take a magnet, screw or pin (below) are generated.  you can change the screw

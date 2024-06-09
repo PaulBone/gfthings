@@ -23,7 +23,9 @@ class ScrewSupport(BasePartObject):
 
         with BuildPart() as p:
             len = screw_offset + margin
-            Box(len, len, plate_base_height)
+            # These were a bit too tall until I took 0.1mm off.
+            height = plate_base_height - 0.1
+            Box(len, len, height)
             with Locations(faces().filter_by(Plane.XY).sort_by(Axis.Z)[-1]):
                 offset = screw_offset - len/2
                 with Locations((offset, offset)):
@@ -33,11 +35,11 @@ class ScrewSupport(BasePartObject):
                         CounterBoreHole(screw_rad, magnet_rad, magnet_depth)
             minor_len = plate_height_a + plate_height_c
             with Locations((-len/2, -len/2)):
-                Box(minor_len, len + margin, plate_base_height,
+                Box(minor_len, len + margin, height,
                     align=(Align.MAX, Align.MIN, Align.CENTER))
-                Box(len + margin, minor_len, plate_base_height,
+                Box(len + margin, minor_len, height,
                     align=(Align.MIN, Align.MAX, Align.CENTER))
-                Box(minor_len, minor_len, plate_base_height,
+                Box(minor_len, minor_len, height,
                     align=(Align.MAX, Align.MAX, Align.CENTER))
 
             fillet(edges().filter_by(Axis.Z).group_by(Axis.Y)[-2].sort_by(Axis.X)[1],

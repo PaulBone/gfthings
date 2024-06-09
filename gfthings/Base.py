@@ -57,20 +57,21 @@ class EdgeCut(BasePartObject):
                  mode: Mode = Mode.ADD):
         with BuildPart() as p:
             import math
-            tri_len = math.tan(30.0 * math.pi/180.0)*plate_height
+            # I'm not sure where the 0.05 fudge factor comes from but it seems to work.
+            cutout_height = plate_height + 0.05
+            tri_len = math.tan(30.0 * math.pi/180.0)*cutout_height
             cutout_short_len = cutout_long_len - tri_len*2
-
             with Locations((0, 0, -3)):
                 with BuildSketch(Plane.XY):
-                    Rectangle(cutout_short_len, plate_height)
+                    Rectangle(cutout_short_len, cutout_height)
                     with Locations(
                             edges().filter_by(Axis.Y).sort_by(Axis.X)[0]@0.5):
-                        Triangle(a=plate_height, b=tri_len, C=90,
+                        Triangle(a=cutout_height, b=tri_len, C=90,
                                  align=(Align.CENTER, Align.MIN),
                                  rotation=90)
                     with Locations(
                             edges().filter_by(Axis.Y).sort_by(Axis.X)[-1]@0.5):
-                        Triangle(a=tri_len, b=plate_height, C=90,
+                        Triangle(a=tri_len, b=cutout_height, C=90,
                                  align=(Align.MAX, Align.CENTER),
                                  rotation=180)
             extrude(amount=6)

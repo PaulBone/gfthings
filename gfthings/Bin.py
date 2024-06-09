@@ -111,6 +111,7 @@ class Bin(BasePartObject):
                  scoop_rad : float,
                  divisions : int = 1,
                  rotation: tuple[float, float, float] | Rotation = (0, 0, 0),
+                 label: bool = True,
                  align: Align | tuple[Align, Align, Align] = None,
                  mode: Mode = Mode.ADD):
         height = 7 * height_units
@@ -157,18 +158,19 @@ class Bin(BasePartObject):
                 BinLip(width, depth, shelf_clearance=shelf_clearance,
                        align=(Align.CENTER, Align.CENTER, Align.MAX))
             
-            with Locations(Plane(origin=faces().filter_by(Plane.XZ)
-                    .sort_by(Axis.Y)[-1].edges().filter_by(Axis.X)
-                    .sort_by(Axis.Z)[-1]@0.5)):
-                with Locations((0, -wall_thickness, -plate_height)):
-                    LabelShelf(box_width - 2*wall_thickness, shelf_clearance,
-                               align=(Align.CENTER, Align.MAX, Align.MAX))
-                    # Cut out parts for the label to fit under.
-                    with Locations((0, -label_depth/2 - plate_height_a -
-                            plate_height_c + wall_thickness, 0)):
-                        Box(box_width - 2*wall_thickness, label_tab_depth, 1,
-                            align=(Align.CENTER, Align.CENTER, Align.MAX),
-                            mode=Mode.SUBTRACT)
+            if label:
+                with Locations(Plane(origin=faces().filter_by(Plane.XZ)
+                        .sort_by(Axis.Y)[-1].edges().filter_by(Axis.X)
+                        .sort_by(Axis.Z)[-1]@0.5)):
+                    with Locations((0, -wall_thickness, -plate_height)):
+                        LabelShelf(box_width - 2*wall_thickness, shelf_clearance,
+                                align=(Align.CENTER, Align.MAX, Align.MAX))
+                        # Cut out parts for the label to fit under.
+                        with Locations((0, -label_depth/2 - plate_height_a -
+                                plate_height_c + wall_thickness, 0)):
+                            Box(box_width - 2*wall_thickness, label_tab_depth, 1,
+                                align=(Align.CENTER, Align.CENTER, Align.MAX),
+                                mode=Mode.SUBTRACT)
             
             # Round off the top edge because it's too sharp for 3D printing.
             with Locations(bounding_box().faces().filter_by(Plane.XY)

@@ -47,6 +47,10 @@ def main(argv: list[str] | None = None):
             "as the pockets become too small to fit my finger in. " +
             "(default %(default)s)",
         default=1)
+    parser.add_argument(
+        "--no-label",
+        help="Don't add a shelf for the label",
+        action="store_true")
         
     args = parser.parse_args(argv)
     x = int(args.x)
@@ -55,7 +59,7 @@ def main(argv: list[str] | None = None):
     scoop = float(args.scoop)
     divisions = int(args.divisions)
 
-    bin = Bin(x, y, z, scoop, divisions=divisions)
+    bin = Bin(x, y, z, scoop, divisions=divisions, label=not args.no_label)
     
     if args.vscode:
         from ocp_vscode import (show_object,

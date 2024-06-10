@@ -70,13 +70,18 @@ def main(argv: list[str] | None = None):
     args = parser.parse_args(argv)
 
     if args.loop:
+        def make_variant(file, obj):
+            print(f"Writing {file}")
+            export_step(obj, file)
+
         for x in range(1, 6):
             for y in range(1, 6):
                 for screw_count in [0, 2, 4]:
-                    file = f"base-{x}x{y}-s{screw_count}.step"
-                    print(f"Writing {file}")
-                    base = BaseGrid(x, y, screw_hole_count=screw_count)
-                    export_step(base, file)
+                    make_variant(f"base-{x}x{y}-s{screw_count}.step",
+                                 BaseGrid(x, y, screw_hole_count=screw_count))
+                if (x > 3) and (y > 3):
+                    make_variant(f"base-{x}x{y}-sd.step",
+                                BaseGrid(x, y, screw_hole_pattern_drawer=True))
 
     else:
         x = int(args.x)

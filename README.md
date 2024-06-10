@@ -13,7 +13,7 @@ Look on [thangs](thangs.com) and
 Setup, You can install with pipx.
 
     sudo apt install pipx
-    pipx install git+https://github.com/PaulBone/gfthings.git
+    pipx install gfthings
 
 If you want to modify gfthings then build it with poetry.
 
@@ -119,5 +119,13 @@ the question hasn't come up!
 
 ![](images/pin-render.png)
 ![](images/pin-irl.jpeg)
+
+
+Links
+-----
+
+ * Pypi package: https://pypi.org/project/gfthings/
+ * gfbase on Printables: https://www.printables.com/model/907320-gridfinity-base-light-connectable-parametric-79-va
+ * gfpin on Printables: https://www.printables.com/model/883473-pinpeg-for-securing-to-plywood
 
 

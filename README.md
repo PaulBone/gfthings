@@ -42,13 +42,44 @@ information see:
 
     gfbin -h
 
-To make labels for these bins we suggest
-[gflabel](https://github.com/ndevenish/gflabel)
-and choose pred style labels.
-
 ![](images/bin-render.png)
 ![](images/bin-irl.jpeg)
 
+The bins have a label shelf, of course you could use a label maker and stick
+on a lable.
+Or 3D print a label with Nick's excellent
+[gflabel](https://github.com/ndevenish/gflabel) program and choose pred
+style labels.
+
+Maybe you can just tell what's in your bins and don't need a label.  That's
+what the `--no-label` option is for!
+
+![](images/bin-no-label.jpeg)
+
+Ooh, that bin has a dividor.  To add dividors use the -d option.  Giving a 2
+will make 2 compartments (1 partition).  The above bin was made with:
+
+    gfbin --no-label -d 2 -s 10
+
+The -s is for scoop radius.  A little scoop in the front of the bin will
+help you get small parts out.  This one has a 10mm radius, the default is
+12.5mm.  Use -s 0 for no scoop at the front at all, eg if you want to store
+larger items.
+
+You can make bins of any size, units are specified in "gridfinity units",
+that's 42mm across and back-to-front. Up and down is 7mm per unit
+plus the base.
+
+![](images/bin-sizes.jpeg)
+
+The two bins on top of this stack are generated with 
+
+    gfbin -x 2 -y 2 -z 3 -d 6 -s 0
+    gfbin -x 1 -y 2 -z 4 -s 0
+
+Checkout reminders for these options and more with
+
+    gfbin -h
 
 Bases
 -----

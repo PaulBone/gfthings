@@ -185,3 +185,11 @@ class Bin(BasePartObject):
             
 
         super().__init__(p.part, rotation, align, mode)
+
+if __name__ == "__main__":
+    test = BinBase(refined=True)
+    from ocp_vscode import (show_object,
+                            set_port)
+    set_port(3939)
+    show_object(test, "bin")
+    #export_step(test, "test.step")

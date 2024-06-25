@@ -10,17 +10,53 @@ from gfthings.GFProfile import GFProfileBin, GFProfileLip
 
 magnet_depth=2.2
 
+class RefinedMagnetHole(BasePartObject):
+    def __init__(self,
+                 magnet_w: float = 6,
+                 magnet_h: float = 2,
+                 magnet_dist_h: float = 0.6,
+                 rotation: tuple[float, float, float] | Rotation = (0, 0, 0),
+                 align: Align | tuple[Align, Align, Align] = None,
+                 mode: Mode = Mode.ADD):
+        with BuildPart() as p:
+            magnet_offset = 4.8 + 0.8
+            cavity_h = magnet_offset+magnet_w/2
+            with BuildSketch(Plane.XY):
+                Rectangle(magnet_w, cavity_h)
+                with Locations((-magnet_w/2, -cavity_h/2)):
+                    Triangle(a=3, b=3, C=90, align=(Align.MAX, Align.MIN))
+               
+            extrude(amount=-magnet_h)
+            fillet(edges().filter_by(Axis.Z).group_by(Axis.Y)[-1], radius=magnet_w/2-0.1)
+            fillet(edges().filter_by(Axis.Z).group_by(Axis.X)[1],
+                   radius=2)
+            with BuildSketch(Plane.XY):
+                with Locations((0, cavity_h/2-magnet_w/2)):
+                    RectangleRounded(3, 6, radius=1.2, align=(Align.CENTER, Align.MIN))
+            extrude(amount=-magnet_h - magnet_dist_h)
+
+        super().__init__(p.part, rotation, align, mode)
+
 class BinBase(BasePartObject):
     def __init__(self,
+                 refined: bool = True,
                  rotation: tuple[float, float, float] | Rotation = (0, 0, 0),
                  align: Align | tuple[Align, Align, Align] = None,
                  mode: Mode = Mode.ADD):
         with BuildPart() as p:
             GFProfileBin()
-            with Locations(faces().filter_by(Plane.XY).sort_by(Axis.Z)[0]):
-                magnet_offset = 35.6/2 - 4.8
-                with GridLocations(magnet_offset*2, magnet_offset*2, 2, 2):
-                    Hole(magnet_dia/2, magnet_depth)                
+            if refined:
+                with Locations(faces().filter_by(Plane.XY).sort_by(Axis.Z)[0]):
+                    with PolarLocations(0, 4):
+                        with Locations((35.6/2-4.8+3, 35.6/2+0.8)):
+                            RefinedMagnetHole(mode=Mode.SUBTRACT,
+                                            align=(Align.MAX, Align.MIN, Align.MIN),
+                                            rotation=(180, 0, 0))
+            else:
+                with Locations(faces().filter_by(Plane.XY).sort_by(Axis.Z)[0]):
+                    magnet_offset = 35.6/2 - 4.8
+                    with GridLocations(magnet_offset*2, magnet_offset*2, 2, 2):
+                        Hole(magnet_dia/2, magnet_depth)                
             
         super().__init__(p.part, rotation, align, mode)
 

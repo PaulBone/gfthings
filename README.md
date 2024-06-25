@@ -80,6 +80,14 @@ out.
 
 ![](images/bin-refined-insert.jpeg)
 
+By default this fits 6x2 magnets, but maybe you've got some 8x3 magnets left
+over from another project?
+
+    gfbin --magnet-dia 8 --magnet-height 3
+
+Or maybe you don't want "gridfinity refined" style magnet holes.  Try
+`--unrefined`.
+
 You can make bins of any size, units are specified in "gridfinity units",
 that's 42mm across and back-to-front. Up and down is 7mm per unit
 plus the base.

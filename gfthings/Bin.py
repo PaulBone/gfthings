@@ -162,8 +162,12 @@ class Bin(BasePartObject):
                 with Locations(Plane(origin=faces().filter_by(Plane.XZ)
                         .sort_by(Axis.Y)[-1].edges().filter_by(Axis.X)
                         .sort_by(Axis.Z)[-1]@0.5)):
+                    shelf_overhang_angle = 90
+                    if inner_width / divisions > max_bridging_distance:
+                        shelf_overhang_angle = max_overhang_angle
                     with Locations((0, -wall_thickness, -plate_height)):
                         LabelShelf(box_width - 2*wall_thickness, shelf_clearance,
+                                   shelf_overhang_angle=shelf_overhang_angle,
                                 align=(Align.CENTER, Align.MAX, Align.MAX))
                         # Cut out parts for the label to fit under.
                         with Locations((0, -label_depth/2 - plate_height_a -

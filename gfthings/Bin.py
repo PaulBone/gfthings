@@ -8,8 +8,6 @@ from build123d.topology import Part, Solid
 from gfthings.parameters import *
 from gfthings.GFProfile import GFProfileBin, GFProfileLip
 
-magnet_depth=2.2
-
 class RefinedMagnetHole(BasePartObject):
     def __init__(self,
                  magnet_w: float = 6,
@@ -19,27 +17,31 @@ class RefinedMagnetHole(BasePartObject):
                  align: Align | tuple[Align, Align, Align] = None,
                  mode: Mode = Mode.ADD):
         with BuildPart() as p:
-            magnet_offset = 4.8 + 0.8
+            magnet_offset = 4.8 + 0.8 + 2.15
             cavity_h = magnet_offset+magnet_w/2
+            triangle_len = max(cavity_h - magnet_w, 1 + 0.8 + 2.15)
             with BuildSketch(Plane.XY):
                 Rectangle(magnet_w, cavity_h)
                 with Locations((-magnet_w/2, -cavity_h/2)):
-                    Triangle(a=3, b=3, C=90, align=(Align.MAX, Align.MIN))
-               
+                    Triangle(a=triangle_len, b=triangle_len, C=90, align=(Align.MAX, Align.MIN))
+
             extrude(amount=-magnet_h)
             fillet(edges().filter_by(Axis.Z).group_by(Axis.Y)[-1], radius=magnet_w/2-0.1)
             fillet(edges().filter_by(Axis.Z).group_by(Axis.X)[1],
                    radius=2)
             with BuildSketch(Plane.XY):
                 with Locations((0, cavity_h/2-magnet_w/2)):
-                    RectangleRounded(3, 6, radius=1.2, align=(Align.CENTER, Align.MIN))
+                    RectangleRounded(magnet_w/2, magnet_w, radius=magnet_w/4-0.1,
+                                     align=(Align.CENTER, Align.MIN))
             extrude(amount=-magnet_h - magnet_dist_h)
 
         super().__init__(p.part, rotation, align, mode)
 
 class BinBase(BasePartObject):
     def __init__(self,
-                 refined: bool = True,
+                 refined: bool,
+                 magnet_dia: float,
+                 magnet_depth: float,
                  rotation: tuple[float, float, float] | Rotation = (0, 0, 0),
                  align: Align | tuple[Align, Align, Align] = None,
                  mode: Mode = Mode.ADD):
@@ -48,10 +50,12 @@ class BinBase(BasePartObject):
             if refined:
                 with Locations(faces().filter_by(Plane.XY).sort_by(Axis.Z)[0]):
                     with PolarLocations(0, 4):
-                        with Locations((35.6/2-4.8+3, 35.6/2+0.8)):
-                            RefinedMagnetHole(mode=Mode.SUBTRACT,
-                                            align=(Align.MAX, Align.MIN, Align.MIN),
-                                            rotation=(180, 0, 0))
+                        with Locations((35.6/2-4.8+magnet_dia/2, 35.6/2+0.8+2.15)):
+                            RefinedMagnetHole(magnet_h=magnet_depth,
+                                              magnet_w=magnet_dia,
+                                              mode=Mode.SUBTRACT,
+                                              align=(Align.MAX, Align.MIN, Align.MIN),
+                                              rotation=(180, 0, 0))
             else:
                 with Locations(faces().filter_by(Plane.XY).sort_by(Axis.Z)[0]):
                     magnet_offset = 35.6/2 - 4.8
@@ -146,6 +150,9 @@ class Bin(BasePartObject):
                  height_units : int,
                  scoop_rad : float,
                  divisions : int = 1,
+                 refined : bool = True,
+                 magnet_dia : float = 6,
+                 magnet_depth : float = 2,
                  rotation: tuple[float, float, float] | Rotation = (0, 0, 0),
                  label: bool = True,
                  align: Align | tuple[Align, Align, Align] = None,
@@ -160,7 +167,10 @@ class Bin(BasePartObject):
             fillet(edges().filter_by(Axis.Z), radius=outer_rad)
             with Locations((0, 0, -wall_height/2)):
                 with GridLocations(bin_size, bin_size, width, depth):
-                    BinBase(align=(Align.CENTER, Align.CENTER, Align.MAX))
+                    BinBase(refined=refined,
+                            magnet_dia=magnet_dia,
+                            magnet_depth=magnet_depth,
+                            align=(Align.CENTER, Align.CENTER, Align.MAX))
             
             inner_width = width * bin_size - bin_clearance*2 - wall_thickness*2
             inner_depth = depth * bin_size - bin_clearance*2 - wall_thickness*2
@@ -223,7 +233,7 @@ class Bin(BasePartObject):
         super().__init__(p.part, rotation, align, mode)
 
 if __name__ == "__main__":
-    test = BinBase(refined=True)
+    test = Bin(width=1, depth=1, height_units=4, scoop_rad=10)
     from ocp_vscode import (show_object,
                             set_port)
     set_port(3939)

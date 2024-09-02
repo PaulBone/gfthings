@@ -4,8 +4,6 @@
 from build123d import *
 from build123d.build_enums import Align, Mode
 from build123d.topology import Part, Solid
-from ocp_vscode import show, reset_show, set_port, set_defaults, get_defaults, show_object
-set_port(3939)
 
 from gfthings.parameters import *
 
@@ -92,6 +90,9 @@ class GFProfileLip(BasePartObject):
         super().__init__(p.part, rotation, align, mode)
 
 if (__name__ == "__main__"):
+    from ocp_vscode import show, reset_show, set_port, set_defaults, get_defaults, show_object
+    set_port(3939)
+
     show_object(GFProfilePlate(), "plate", measure_tools=True)
     show_object(GFProfileBin(), "bin", measure_tools=True)
     show_object(GFProfileLip(1, 2, support=60), "lip", measure_tools=True)

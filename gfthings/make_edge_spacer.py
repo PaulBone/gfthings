@@ -4,8 +4,6 @@
 from build123d import *
 from build123d.build_enums import Align, Mode
 from build123d.topology import Part, Solid
-from ocp_vscode import show, show_object, reset_show, set_port, set_defaults, get_defaults
-set_port(3939)
 
 from parameters import *
 from Base import *
@@ -96,5 +94,4 @@ for space in range(10, 20, 2):
 
         name = "edge_%d_x%d.step" % (space, num+1)
         export_step(p.part, name)
-        show_object(p.part, name=name)
 

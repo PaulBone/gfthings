@@ -5,8 +5,8 @@ from build123d import *
 from build123d.build_enums import Align, Mode
 from build123d.topology import Part, Solid
 
-from parameters import *
-from Base import *
+from gfthings.parameters import *
+from gfthings.Base import *
 
 class VerticalScrewHole(BasePartObject):
     def __init__(self, width, height, screw_offset,
@@ -24,7 +24,7 @@ class VerticalScrewHole(BasePartObject):
         super().__init__(p.part, rotation, align, mode)
 
 class EdgeSpacer(BasePartObject):
-    def __init__(self, space : float,
+    def __init__(self, space : float, crossbar : bool = False,
                  rotation: tuple[float, float, float] | Rotation = (0, 0, 0),
                  align: Align | tuple[Align, Align, Align] = None,
                  mode: Mode = Mode.ADD):
@@ -57,9 +57,12 @@ class EdgeSpacer(BasePartObject):
                             -plate_base_height/2)):
                 Box(space, structure_thickness, plate_base_height,
                     align=(Align.MIN, Align.MAX, Align.MIN))
-            with Locations((-structure_thickness/2, 0, -plate_base_height/2)):
-                Box(space, structure_thickness*2, plate_base_height,
-                    align=(Align.MIN, Align.CENTER, Align.MIN))
+            if crossbar:
+                with Locations((-structure_thickness/2,
+                                0,
+                                -plate_base_height/2)):
+                    Box(space, structure_thickness*2, plate_base_height,
+                        align=(Align.MIN, Align.CENTER, Align.MIN))
             with Locations((space - structure_thickness/2,
                             0,
                             -plate_base_height/2)):
@@ -70,9 +73,10 @@ class EdgeSpacer(BasePartObject):
             fillet(edges().filter_by(Axis.Z).group_by(Axis.Y)[1] + 
                    edges().filter_by(Axis.Z).group_by(Axis.Y)[-2],
                    radius=z_fillet_rad)
-            fillet(edges().filter_by(Axis.Z).group_by(Axis.Y)[4] +
-                   edges().filter_by(Axis.Z).group_by(Axis.Y)[5],
-                   radius=z_fillet_rad)
+            if crossbar:
+                fillet(edges().filter_by(Axis.Z).group_by(Axis.Y)[4] +
+                       edges().filter_by(Axis.Z).group_by(Axis.Y)[5],
+                       radius=z_fillet_rad)
 
 # Exprimental feature, screw holes that let you attach to the side of
 # drawers where the wood is likely thicker.
@@ -86,12 +90,20 @@ class EdgeSpacer(BasePartObject):
 
         super().__init__(p.part, rotation, align, mode)
 
-for space in range(10, 20, 2):
-    for num in range(4):
+class Edge(BasePartObject):
+    def __init__(self, units : int, space : float,
+                 rotation: tuple[float, float, float] | Rotation = (0, 0, 0),
+                 align: Align | tuple[Align, Align, Align] = None,
+                 mode: Mode = Mode.ADD):
         with BuildPart() as p:
-            with GridLocations(bin_size, bin_size, 1, num+1):
+            with GridLocations(bin_size, bin_size, 1, units):
                 EdgeSpacer(space)
 
-        name = "edge_%d_x%d.step" % (space, num+1)
-        export_step(p.part, name)
-
+        super().__init__(p.part, rotation, align, mode)
+        
+if __name__ == "__main__":
+    e = Edge(4, 22)
+    from ocp_vscode import show, show_object, reset_show, set_port, set_defaults, get_defaults
+    set_port(3939)
+    show_object(e)
+    

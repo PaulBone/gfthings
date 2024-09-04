@@ -18,6 +18,7 @@ Homepage = "https://github.com/PaulBone/gfthings"
 gfpin = "gfthings.gfpin:main"
 gfbin = "gfthings.gfbin:main"
 gfbase = "gfthings.gfbase:main"
+gfedge = "gfthings.gfedge:main"
 
 [tool.poetry.dependencies]
 python = "^3.10"

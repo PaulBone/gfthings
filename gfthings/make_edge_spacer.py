@@ -58,8 +58,8 @@ class EdgeSpacer(BasePartObject):
             #fillet(edges().filter_by(Axis.X).group_by(Axis.Y)[-4].sort_by(Axis.Z)[0],
             #       radius=z_fillet_rad)
 
-            with Locations((space - structure_thickness/2, 0, -plate_base_height/2)):
-                VerticalScrewHole(10, 15, 4, align=(Align.MAX, Align.CENTER, Align.MIN))
+            #with Locations((space - structure_thickness/2, 0, -plate_base_height/2)):
+            #    VerticalScrewHole(10, 15, 4, align=(Align.MAX, Align.CENTER, Align.MIN))
 
         super().__init__(p.part, rotation, align, mode)
 

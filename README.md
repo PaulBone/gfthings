@@ -103,6 +103,17 @@ boxes.
 
 ![](images/base-screws-drawer.png)
 
+Base Edges
+----------
+
+I don't know about you but my drawers arn't multiples of 42mm and I don't want the bases sliding around in the drawers.  So I've added another program that creates "edge spaces" to fill up room and stop be base from slopping around.
+
+    gfedge -x 4 -y 14 -o edge.step
+
+Like before the -x parameter is in gridfinity units.  But the -y parameter is not!  It's in milimetres.
+
+![](images/edge.png)
+
 Pins
 ----
 

@@ -81,6 +81,41 @@ Checkout reminders for these options and more with
 
     gfbin -h
 
+Funky bins
+----------
+
+I had a tool that has an L shape, storing it in a rectangle bin would be a waste.  So I created funky bins.  They're specified by providing a 2D list of bools that specify is that square is part of the bin or not.
+
+    gfbin --funky \
+        "[[True, False], [[True, False], [True, False],[True, True]]" \
+        -z 14
+
+![](images/big_l.png)
+
+The minor lists must all have the same length, and generating bins in this way has a finer stacking lip than when the regular `-x` and `-y` arguments are used (currently a build123d limitation).
+
+L-shaped bins are possibly the most useful, but there are many possibilities.  Some "special" arguments for `--funky` refer to presets that may be fun, try:
+
+    gfbin --funky donut -z 4 -o donut.step
+
+![](images/donut.png)
+
+Maybe this would be a suitable box for coiled USB cables, then place a 1x1 bin in the centre for USB A-to-C adaptors.
+
+The available presets are:
+
+ * donut
+ * cross
+ * tetris_l
+ * tetris_j
+ * tetris_t
+ * tetris_s
+ * tetris_z
+
+![](images/tetris_l.jpeg)
+
+Now packing your storage away can really be like tetris.  Just don't completely fill a row!
+
 Bases
 -----
 

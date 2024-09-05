@@ -4,7 +4,7 @@
 from argparse import ArgumentParser
 from build123d import *
 
-from gfthings.Bin import Bin
+from gfthings.Bin import (Bin, FunkyBin)
 
 def main(argv: list[str] | None = None):
     parser = ArgumentParser(
@@ -73,6 +73,16 @@ def main(argv: list[str] | None = None):
              "(default %(default)s)",
         type=float,
         default=2)
+    parser.add_argument(
+        "--funky",
+        help="Generate a 'funky' bin.  This allows the user to make " +
+            "non-rectangular bins such as L shapes.  The argument is a " +
+            "python expression that evaluates to a 2D rectangular array " +
+            "of bools, True for a filled square and False for an empty one. " +
+            "In this mode, the x and y parameters are ignored, shelves, " + 
+            "scoops and divisions aren't supported.",
+        type=str,
+        default="")
     
     args = parser.parse_args(argv)
     x = int(args.x)
@@ -81,7 +91,42 @@ def main(argv: list[str] | None = None):
     scoop = float(args.scoop)
     divisions = int(args.divisions)
 
-    bin = Bin(x, y, z, scoop,
+    bin = None
+    funky = args.funky
+    if funky != "":
+        if funky == "donut":
+            funky_expr = [[True, True, True], 
+                          [True, False, True],
+                          [True, True, True]]
+        elif funky == "cross":
+            funky_expr = [[False, True, False],
+                          [True, True, True],
+                          [False, True, False]]
+        elif funky == "tetris_l":
+            funky_expr = [[True, False],
+                          [True, False],
+                          [True, True]]
+        elif funky == "tetris_j":
+            funky_expr = [[False, True],
+                          [False, True],
+                          [True, True]]
+        elif funky == "tetris_t":
+            funky_expr = [[False, True, False],
+                          [True, True, True]]
+        elif funky == "tetris_s":
+            funky_expr = [[False, True, True],
+                          [True, True, False]]
+        elif funky == "tetris_z":
+            funky_expr =[[True, True, False],
+                         [False, True, True]]
+        else:
+            funky_expr = eval(args.funky)
+        bin = FunkyBin(list(reversed(funky_expr)), z,
+                       refined=not args.unrefined,
+                       magnet_dia=args.magnet_dia,
+                       magnet_depth=args.magnet_height)
+    else:
+        bin = Bin(x, y, z, scoop,
               divisions=divisions,
               label=not args.no_label,
               refined=not args.unrefined,

@@ -28,11 +28,13 @@ def main(argv: list[str] | None = None):
     parser.add_argument(
         "-x",
         help="Number of squares across (default: %(default)s",
-        default=4)
+        default=4,
+        type=int)
     parser.add_argument(
         "-y",
         help="Number of squares deep (default: %(default)s",
-        default=4)
+        default=4,
+        type=int)
     parser.add_argument(
         "--screw-diameter",
         help="Diameter for screw holes (default: %(default)s",
@@ -84,8 +86,8 @@ def main(argv: list[str] | None = None):
                                 BaseGrid(x, y, screw_hole_pattern_drawer=True))
 
     else:
-        x = int(args.x)
-        y = int(args.y)
+        x = args.x
+        y = args.y
         screw_rad = args.screw_diameter/2
         magnet_rad = args.magnet_diameter/2
         magnet_depth = args.magnet_depth

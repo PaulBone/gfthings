@@ -51,7 +51,29 @@ def main(argv: list[str] | None = None):
         "--no-label",
         help="Don't add a shelf for the label",
         action="store_true")
-        
+    parser.add_argument(
+        "--unrefined",
+        help="Use unrefined magnet holes. " +
+            "Gridfinity Refind " + 
+            "https://www.printables.com/model/413761-gridfinity-refined " +
+            "has improved magnet holes that don't require glue, " +
+            "If for some reason you don't want superiour magnet holes then " +
+            "--unrefind will switch to plain circular holes",
+        action="store_true")
+    parser.add_argument(
+        "--magnet-dia",
+        help="Magnet hole diameter or width for 'refined' holes. " +
+             "(default %(default)s)",
+        type=float,
+        default=6)
+    parser.add_argument(
+        "--magnet-height",
+        help="Height of refind magnet slots / " + 
+             "depth of traditional magnet holes. " +
+             "(default %(default)s)",
+        type=float,
+        default=2)
+    
     args = parser.parse_args(argv)
     x = int(args.x)
     y = int(args.y)
@@ -59,7 +81,12 @@ def main(argv: list[str] | None = None):
     scoop = float(args.scoop)
     divisions = int(args.divisions)
 
-    bin = Bin(x, y, z, scoop, divisions=divisions, label=not args.no_label)
+    bin = Bin(x, y, z, scoop,
+              divisions=divisions,
+              label=not args.no_label,
+              refined=not args.unrefined,
+              magnet_dia=args.magnet_dia,
+              magnet_depth=args.magnet_height)
     
     if args.vscode:
         from ocp_vscode import (show_object,

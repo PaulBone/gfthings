@@ -33,7 +33,14 @@ def main(argv: list[str] | None = None):
         set_port(args.vscode)
         show_object(pin)
     else:
-        export_step(pin, args.output)
+        if args.output.endswith(".step"):
+            export_step(bin, args.output)
+        elif args.output.endswith('.stl'):
+            export_stl(bin, args.output)
+        else:
+            print("Unknown output format.")
+            exit(1)
+
 
 if __name__ == "__main__":
     import sys

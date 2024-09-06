@@ -232,10 +232,72 @@ class Bin(BasePartObject):
 
         super().__init__(p.part, rotation, align, mode)
 
+class FunkyBin(BasePartObject):
+    def __init__(self,
+                 array : list,
+                 height_units : int,
+                 refined : bool = True,
+                 magnet_dia : float = 6,
+                 magnet_depth : float = 2,
+                 rotation: tuple[float, float, float] | Rotation = (0, 0, 0),
+                 align: Align | tuple[Align, Align, Align] = None,
+                 mode: Mode = Mode.ADD):
+        stacking_lip_height = 0.7 + 1.8 + 1.9
+        height = 7 * height_units + stacking_lip_height
+        depth = len(array)
+        width = len(array[0])
+        wall_thickness = 1.2
+        with BuildPart() as p:
+            wall_height = height - plate_height
+            box_width = width * bin_size - bin_clearance * 2
+            box_depth = depth * bin_size - bin_clearance * 2
+            Box(box_width, box_depth, wall_height)
+
+            for x in range(width):
+                for y in range(depth):
+                    if not array[y][x]:
+                        with Locations(((x - width/2 + 1/2)*bin_size,
+                                        (y - depth/2 + 1/2)*bin_size,
+                                        0)):
+                            Box(bin_size + bin_clearance, bin_size + bin_clearance, wall_height,
+                                mode=Mode.SUBTRACT,
+                                align=(Align.CENTER, Align.CENTER, Align.CENTER))
+            
+            fillet(edges().filter_by(Axis.Z), radius=outer_rad)
+            topf = faces().filter_by(Plane.XY).sort_by(Axis.Z)[-1]
+            prev_top_edge = edges().filter_by(Plane.XY).group_by(Axis.Z)[-1]
+            offset(amount=-wall_thickness, openings=topf)
+            
+            new_top_edge = edges().filter_by(Plane.XY).group_by(Axis.Z)[-1] - prev_top_edge
+            # Form the stacking lip by chamfering the inner edge.
+            chamfer(new_top_edge, length=wall_thickness - 0.01)
+
+            for x in range(width):
+                for y in range(depth):
+                    if array[y][x]:
+                        with Locations(((x - width/2 + 1/2)*bin_size,
+                                        (y - depth/2 + 1/2)*bin_size,
+                                        -wall_height/2)):
+                            BinBase(refined=refined,
+                                    magnet_depth=magnet_depth,
+                                    magnet_dia=magnet_dia,
+                                    align=(Align.CENTER, Align.CENTER, Align.MAX))
+
+            # Round off the top edge because it's too sharp for 3D printing.
+            with Locations(bounding_box().faces().filter_by(Plane.XY)
+                    .sort_by(Axis.Z)[-1].center()):
+                Box(box_width, box_depth, 0.3,
+                    align=(Align.CENTER, Align.CENTER, Align.MAX),
+                    mode=Mode.SUBTRACT)
+
+        super().__init__(p.part, rotation, align, mode)
+
 if __name__ == "__main__":
-    test = Bin(width=1, depth=1, height_units=4, scoop_rad=10)
+    test = FunkyBin([[True, False, False],
+                    [True, True, True]],
+                    4)
     from ocp_vscode import (show_object,
                             set_port)
     set_port(3939)
     show_object(test, "bin")
-    #export_step(test, "test.step")
+    export_step(test, "funky_bin.step")

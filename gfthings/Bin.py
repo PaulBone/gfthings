@@ -242,8 +242,7 @@ class FunkyBin(BasePartObject):
                  rotation: tuple[float, float, float] | Rotation = (0, 0, 0),
                  align: Align | tuple[Align, Align, Align] = None,
                  mode: Mode = Mode.ADD):
-        stacking_lip_height = 0.7 + 1.8 + 1.9
-        height = 7 * height_units + stacking_lip_height
+        height = 7 * height_units + 0
         depth = len(array)
         width = len(array[0])
         wall_thickness = 1.2
@@ -265,12 +264,30 @@ class FunkyBin(BasePartObject):
             
             fillet(edges().filter_by(Axis.Z), radius=outer_rad)
             topf = faces().filter_by(Plane.XY).sort_by(Axis.Z)[-1]
-            prev_top_edge = edges().filter_by(Plane.XY).group_by(Axis.Z)[-1]
             offset(amount=-wall_thickness, openings=topf)
             
-            new_top_edge = edges().filter_by(Plane.XY).group_by(Axis.Z)[-1] - prev_top_edge
-            # Form the stacking lip by chamfering the inner edge.
-            chamfer(new_top_edge, length=wall_thickness - 0.01)
+            # Form the stacking lip by sweeping the profile along the top faces outer wire.
+            topf = faces().filter_by(Plane.XY).sort_by(Axis.Z)[-1]
+            topw = topf.outer_wire()
+            with BuildSketch(Plane(topw @ 0, z_dir=topw % 0, x_dir=(0,-1,0))):
+                # XXX Offseting this sketch in X doesn't fix the problem.
+                with Locations((-0.001, 0)):
+                    with BuildLine():
+                        a = 1.9
+                        b = 1.8
+                        c = 0.7
+                        
+                        Polyline((0,     0),
+                                 (0,     a + b + c),
+                                 (a,     b + c),
+                                 (a,     c),
+                                 (a + c, 0),
+                                 (0,     -a - c),
+                                 close=True)
+                make_face()
+            #extrude(amount=5)
+            # XXX clean=False doesn't fix the problem either.
+            sweep(path=topw, clean=False)
 
             for x in range(width):
                 for y in range(depth):
@@ -293,8 +310,8 @@ class FunkyBin(BasePartObject):
         super().__init__(p.part, rotation, align, mode)
 
 if __name__ == "__main__":
-    test = FunkyBin([[True, False, False],
-                    [True, True, True]],
+    test = FunkyBin([[True, True],
+                    [True, False]],
                     4)
     from ocp_vscode import (show_object,
                             set_port)

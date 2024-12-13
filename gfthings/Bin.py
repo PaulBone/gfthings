@@ -100,6 +100,7 @@ class BinLip(BasePartObject):
 class LabelShelf(BasePartObject):
     def __init__(self, len : float,
                  shelf_clearance : float,
+                 wall_thickness : float,
                  shelf_overhang_angle : float = 60,
                  rotation: tuple[float, float, float] | Rotation = (0, 0, 0),
                  align: Align | tuple[Align, Align, Align] = None,
@@ -153,6 +154,7 @@ class Bin(BasePartObject):
                  refined : bool = True,
                  magnet_dia : float = 6,
                  magnet_depth : float = 2,
+                 wall_thickness : float = 1.2,
                  rotation: tuple[float, float, float] | Rotation = (0, 0, 0),
                  label: bool = True,
                  align: Align | tuple[Align, Align, Align] = None,
@@ -213,8 +215,9 @@ class Bin(BasePartObject):
                         shelf_overhang_angle = max_overhang_angle
                     with Locations((0, -wall_thickness, -plate_height)):
                         LabelShelf(box_width - 2*wall_thickness, shelf_clearance,
+                                   wall_thickness=wall_thickness,
                                    shelf_overhang_angle=shelf_overhang_angle,
-                                align=(Align.CENTER, Align.MAX, Align.MAX))
+                                   align=(Align.CENTER, Align.MAX, Align.MAX))
                         # Cut out parts for the label to fit under.
                         with Locations((0, -label_depth/2 - plate_height_a -
                                 plate_height_c + wall_thickness, 0)):
@@ -239,6 +242,7 @@ class FunkyBin(BasePartObject):
                  refined : bool = True,
                  magnet_dia : float = 6,
                  magnet_depth : float = 2,
+                 wall_thickness : float = 1.2,
                  rotation: tuple[float, float, float] | Rotation = (0, 0, 0),
                  align: Align | tuple[Align, Align, Align] = None,
                  mode: Mode = Mode.ADD):
@@ -246,7 +250,6 @@ class FunkyBin(BasePartObject):
         height = 7 * height_units + stacking_lip_height
         depth = len(array)
         width = len(array[0])
-        wall_thickness = 1.2
         with BuildPart() as p:
             wall_height = height - plate_height
             box_width = width * bin_size - bin_clearance * 2
@@ -293,9 +296,9 @@ class FunkyBin(BasePartObject):
         super().__init__(p.part, rotation, align, mode)
 
 if __name__ == "__main__":
-    test = FunkyBin([[True, False, False],
-                    [True, True, True]],
-                    4)
+    test = Bin(1, 1, 4,
+               scoop_rad=10.0,
+               wall_thickness=0.6)
     from ocp_vscode import (show_object,
                             set_port)
     set_port(3939)

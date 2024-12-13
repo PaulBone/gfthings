@@ -18,6 +18,5 @@ edge_cut_len = 26
 max_overhang_angle = 60
 max_bridging_distance = 30
 bin_clearance = 0.5/2
-wall_thickness = 1.2
 label_tab_depth = 6.7
 label_depth = 12

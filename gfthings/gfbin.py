@@ -74,6 +74,15 @@ def main(argv: list[str] | None = None):
         type=float,
         default=2)
     parser.add_argument(
+        "--wall-thickness",
+        help="Thickness of bin walls, " +
+             "you might adjust this if printing with " +
+             "a different nozzle size. " +
+             "(The default of %(default)%, " +
+             "should work nicely for 0.4mm and 0.6mm nozzles)",
+        type=float,
+        default=1.2)
+    parser.add_argument(
         "--funky",
         help="Generate a 'funky' bin.  This allows the user to make " +
             "non-rectangular bins such as L shapes.  The argument is a " +
@@ -124,14 +133,16 @@ def main(argv: list[str] | None = None):
         bin = FunkyBin(list(reversed(funky_expr)), z,
                        refined=not args.unrefined,
                        magnet_dia=args.magnet_dia,
-                       magnet_depth=args.magnet_height)
+                       magnet_depth=args.magnet_height,
+                       wall_thickness=args.wall_thickness)
     else:
         bin = Bin(x, y, z, scoop,
               divisions=divisions,
               label=not args.no_label,
               refined=not args.unrefined,
               magnet_dia=args.magnet_dia,
-              magnet_depth=args.magnet_height)
+              magnet_depth=args.magnet_height,
+              wall_thickness=args.wall_thickness)
     
     if args.vscode:
         from ocp_vscode import (show_object,

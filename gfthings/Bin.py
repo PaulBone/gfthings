@@ -159,6 +159,7 @@ class Bin(BasePartObject):
                  label: bool = True,
                  align: Align | tuple[Align, Align, Align] = None,
                  mode: Mode = Mode.ADD):
+        import math
         height = 7 * height_units
         shelf_clearance = 0.1
         with BuildPart() as p:
@@ -180,12 +181,15 @@ class Bin(BasePartObject):
                 RectangleRounded(inner_width, inner_depth,
                                  radius=outer_rad - bin_clearance -
                                     wall_thickness)
-            inner_height = wall_height - wall_thickness
+            
+            inner_height = wall_height
             extrude(amount=-inner_height, mode=Mode.SUBTRACT)
-
+            
             inner_front_centre = faces().filter_by(Plane.XY) \
                 .sort_by(Axis.Z)[-2].edges().filter_by(Axis.X) \
                 .sort_by(Axis.Y)[0]@0.5
+            # This fillet prevents the wall-base corner from being too thin.
+            fillet(faces().filter_by(Plane.XY).sort_by(Axis.Z)[-2].edges(), radius=wall_thickness)
             if divisions > 1:
                 dividors = divisions-1
                 dividor_space = inner_width / divisions

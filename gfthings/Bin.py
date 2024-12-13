@@ -77,7 +77,7 @@ class Scoop(BasePartObject):
             with BuildSketch(Plane.YZ):
                 Rectangle(rad, rad)
                 with Locations((rad/2, rad/2)):
-                    Circle(rad, rad, mode=Mode.SUBTRACT)
+                    Circle(rad, mode=Mode.SUBTRACT)
             extrude(amount=len)
             with Locations(edges().filter_by(Axis.X).group_by(Axis.Y)[0]
                     .sort_by(Axis.Z)[0]@0.5):

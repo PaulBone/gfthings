@@ -71,8 +71,7 @@ class Scoop(BasePartObject):
                  rotation: tuple[float, float, float] | Rotation = (0, 0, 0),
                  align: Align | tuple[Align, Align, Align] = None,
                  mode: Mode = Mode.ADD):
-        wall_pad = plate_height_a + plate_height_c - wall_thickness - \
-                shelf_clearance
+        wall_pad = 1.9 + 0.7 - wall_thickness
         with BuildPart() as p:
             with BuildSketch(Plane.YZ):
                 Rectangle(rad, rad)

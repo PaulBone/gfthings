@@ -82,6 +82,7 @@ class Scoop(BasePartObject):
                     .sort_by(Axis.Z)[0]@0.5):
                 Box(len, wall_pad, height,
                     align=(Align.CENTER, Align.MAX, Align.MIN))
+            fillet(edges().filter_by(Axis.Z).group_by(Axis.Y)[0], radius=7.5/2-wall_thickness)
 
         super().__init__(p.part, rotation, align, mode)
 
@@ -142,6 +143,8 @@ class LabelShelf(BasePartObject):
                                  close=True)
                     make_face()
                 extrude(amount=len)
+            fillet(edges().filter_by(Axis.Z).group_by(Axis.Y)[-1],
+                   radius=7.5/2-wall_thickness)
             
         super().__init__(p.part, rotation, align, mode)
 

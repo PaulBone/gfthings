@@ -185,13 +185,23 @@ class Bin(BasePartObject):
                                     wall_thickness)
             
             inner_height = wall_height
+            if width > 1 or depth > 1:
+                # For a bin that covers more than one square we need a floor 
+                # to connect the squares.
+                inner_height -= wall_thickness
             extrude(amount=-inner_height, mode=Mode.SUBTRACT)
             
             inner_front_centre = faces().filter_by(Plane.XY) \
                 .sort_by(Axis.Z)[-2].edges().filter_by(Axis.X) \
                 .sort_by(Axis.Y)[0]@0.5
-            # This fillet prevents the wall-base corner from being too thin.
-            fillet(faces().filter_by(Plane.XY).sort_by(Axis.Z)[-2].edges(), radius=wall_thickness)
+            
+            # This fillet rounds off the floor of the bin nicely.
+            inner_fillet_rad=7.5/2 - wall_thickness
+            if inner_height == wall_height:
+                # It is it can also prevent the wall-base corner from being too thin.
+                inner_fillet_rad = max(inner_fillet_rad, wall_thickness)
+            if inner_fillet_rad:
+                fillet(faces().filter_by(Plane.XY).sort_by(Axis.Z)[-2].edges(), radius=inner_fillet_rad)
             if divisions > 1:
                 dividors = divisions-1
                 dividor_space = inner_width / divisions

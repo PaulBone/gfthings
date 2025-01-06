@@ -216,6 +216,7 @@ Links
 -----
 
  * Pypi package: https://pypi.org/project/gfthings/
+ * gfbin on Printables: https://www.printables.com/model/1132524-pauls-gridfinity-bins
  * gfbase on Printables: https://www.printables.com/model/907320-gridfinity-base-light-connectable-parametric-79-va
  * gfpin on Printables: https://www.printables.com/model/883473-pinpeg-for-securing-to-plywood
 

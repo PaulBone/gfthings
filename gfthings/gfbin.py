@@ -20,6 +20,12 @@ def main(argv: list[str] | None = None):
         help="Output filename (default: %(default)s)",
         default="bin.step")
     parser.add_argument(
+        "--loop",
+        help="Generate a number of bins in a loop, bins will be named " +
+             "bin_\*.step.",
+        default=False,
+        action="store_true")
+    parser.add_argument(
         "-x",
         help="Width of the bin in gridfinity units (default: %(default)s)",
         default=1)
@@ -144,6 +150,34 @@ def main(argv: list[str] | None = None):
               magnet_depth=args.magnet_height,
               wall_thickness=args.wall_thickness)
     
+    if args.loop:
+        from pathlib import Path
+        for z in (3, 4, 5, 6):
+            for x in range(1, 6):
+                for y in range(1, 6):
+                    for d in range(1, int(x*5/2)) \
+                            if (x < 3) and y < 3 else (1,):
+                        for s in (0, 10) if y <= 2 else (0,):
+                            for l in (True, False):
+                                file = "bin_%dx%dx%d_d%d_s%s%s" % \
+                                    (x, y, z, d, s, "_label" if l else "")
+                                file_stl = Path(file + ".stl")
+                                file_step = Path(file + ".step")
+                                if file_stl.exists() and file_step.exists():
+                                    print("Skipping %s" % file)
+                                    continue
+
+                                print("Generating %s" % file)
+                                bin = Bin(x, y, z,
+                                          divisions=d,
+                                          scoop_rad=s,
+                                          label=l)
+           
+                                if not file_stl.exists():
+                                    export_stl(bin, str(file_stl))
+                                if not file_step.exists():
+                                    export_step(bin, str(file_step))
+
     if args.vscode:
         from ocp_vscode import (show_object,
                                 set_port)

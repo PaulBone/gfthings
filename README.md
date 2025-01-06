@@ -66,6 +66,20 @@ help you get small parts out.  This one has a 10mm radius, the default is
 12.5mm.  Use -s 0 for no scoop at the front at all, eg if you want to store
 larger items.
 
+Bins are generated with
+[Gridfinity Refined](https://www.printables.com/model/413761-gridfinity-refined)
+style magnet holes.  These are press fit magnet holes that allow you to
+insert a magnet from the side.
+
+![](images/bin-refined.png)
+
+Use the blade of a flat-head screwdriver to push the magnet in.  No worries
+if you put it the wrong way around and need to take it out.  You can get a
+thin pin or alen key into the gap on the bottom of the bin to push it back
+out.
+
+![](images/bin-refined-insert.jpeg)
+
 You can make bins of any size, units are specified in "gridfinity units",
 that's 42mm across and back-to-front. Up and down is 7mm per unit
 plus the base.

@@ -84,7 +84,7 @@ def main(argv: list[str] | None = None):
         help="Thickness of bin walls, " +
              "you might adjust this if printing with " +
              "a different nozzle size. " +
-             "(The default of %(default)%, " +
+             "(The default of %(default)s, " +
              "should work nicely for 0.4mm and 0.6mm nozzles)",
         type=float,
         default=1.2)

@@ -51,11 +51,13 @@ class GFProfile(BasePartObject):
         super().__init__(part=p.part, rotation=rotation, align=align, mode=mode)
 
 class GFProfilePlate(BasePartObject):
-    def __init__(self, rotation: tuple[float, float, float] | Rotation = (0, 0, 0), align: Align | tuple[Align, Align, Align] = None, mode: Mode = Mode.ADD):
+    def __init__(self,
+                 short : bool,
+                 rotation: tuple[float, float, float] | Rotation = (0, 0, 0), align: Align | tuple[Align, Align, Align] = None, mode: Mode = Mode.ADD):
         with BuildPart() as p:
-            Box(bin_size, bin_size, plate_height + plate_base_height - 0.1)
+            Box(bin_size, bin_size, plate_height + plate_base_height(short) - 0.1)
             with Locations(faces().filter_by(Plane.XY).sort_by(Axis.Z)[-1].center()):
-                GFProfile(clearance=0, inner_clearance=0, base=plate_base_height, mode=Mode.SUBTRACT, align=(Align.CENTER, Align.CENTER, Align.MAX))
+                GFProfile(clearance=0, inner_clearance=0, base=plate_base_height(short), mode=Mode.SUBTRACT, align=(Align.CENTER, Align.CENTER, Align.MAX))
             
         super().__init__(p.part, rotation, align, mode)
 

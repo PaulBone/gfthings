@@ -15,6 +15,12 @@ def test_2x2_base():
                          corner_screw_hole_count=0)
     float_eq(9423.834706464077, base.volume)
 
+def test_2x2_short_base():
+    base = Base.BaseGrid(2, 2,
+                         screw_hole_count=0,
+                         short=True)
+    float_eq(4010.0901306660126, base.volume)
+
 def test_1x1_base():
     base = Base.BaseGrid(1, 1,
                          magnet_rad=3.1,
@@ -25,6 +31,12 @@ def test_1x1_base():
                          screw_hole_pattern_drawer=False,
                          corner_screw_hole_count=0)
     float_eq(2383.825305964295, base.volume)
+
+def test_1x1_short_base():
+    base = Base.BaseGrid(1, 1,
+                         screw_hole_count=0,
+                         short=True)
+    float_eq(1049.4015434827163, base.volume)
     
 def test_4_holes():
     base = Base.BaseGrid(2, 2,

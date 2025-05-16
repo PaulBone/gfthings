@@ -68,7 +68,11 @@ def main(argv: list[str] | None = None):
         help="Place four screw holes (in addition to --screw-hole-count) " +
         "in a minimal pattern for installation into drawers. ",
         action="store_true")
-    
+    parser.add_argument(
+        "--short",
+        help="Make the short variant, doesn't support screw holes",
+        action="store_true")
+
     args = parser.parse_args(argv)
 
     if args.loop:
@@ -92,13 +96,15 @@ def main(argv: list[str] | None = None):
         magnet_rad = args.magnet_diameter/2
         magnet_depth = args.magnet_depth
         counter_sink = False
+        screw_hole_count = 2 if not args.short else 0
         base = BaseGrid(x, y,
                         screw_rad=screw_rad,
                         magnet_rad=magnet_rad,
                         magnet_depth=magnet_depth,
                         counter_sink=counter_sink,
-                        screw_hole_count=args.screw_hole_count,
-                        screw_hole_pattern_drawer=args.screw_hole_pattern_drawer)
+                        screw_hole_count=screw_hole_count,
+                        screw_hole_pattern_drawer=args.screw_hole_pattern_drawer,
+                        short=args.short)
 
         if args.vscode:
             from ocp_vscode import show, set_port

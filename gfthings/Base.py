@@ -24,7 +24,7 @@ class ScrewSupport(BasePartObject):
         with BuildPart() as p:
             len = screw_offset + margin
             # These were a bit too tall until I took 0.1mm off.
-            height = plate_base_height - 0.1
+            height = plate_base_height(False) - 0.1
             Box(len, len, height)
             with Locations(faces().filter_by(Plane.XY).sort_by(Axis.Z)[-1]):
                 offset = screw_offset - len/2
@@ -85,11 +85,12 @@ class BaseSquare(BasePartObject):
                  screw_rad : float = 2,
                  counter_sink : bool = False,
                  screw_hole_count : int = 2,
+                 short : bool = False,
                  rotation: tuple[float, float, float] | Rotation = (0, 0, 0),
                  align: Align | tuple[Align, Align, Align] = None,
                  mode: Mode = Mode.ADD):
         with BuildPart() as p:
-            GFProfilePlate()
+            GFProfilePlate(short=short)
 
             if screw_hole_count >= 2:
                 with Locations(
@@ -135,7 +136,7 @@ class BaseSquare(BasePartObject):
                         faces().filter_by(Plane.YZ).sort_by(Axis.X)[-1],
                         faces().filter_by(Plane.XZ).sort_by(Axis.Y)[0],
                         faces().filter_by(Plane.XZ).sort_by(Axis.Y)[-1]):
-                with Locations(((plate_height + plate_base_height)/2, 0, 0)):
+                with Locations(((plate_height + plate_base_height(short))/2, 0, 0)):
                     EdgeCut(edge_cut_len,
                             align=(Align.CENTER, Align.MAX, Align.CENTER),
                             rotation=(0, 0, -90),
@@ -150,6 +151,7 @@ class BaseGrid(BasePartObject):
                  counter_sink : bool = False,
                  screw_hole_count : int = 2,
                  screw_hole_pattern_drawer : bool = False,
+                 short : bool = False,
                  corner_screw_hole_count : int = 0,
                  rotation: tuple[float, float, float] | Rotation = (0, 0, 0),
                  align: Align | tuple[Align, Align, Align] = None,
@@ -160,7 +162,8 @@ class BaseGrid(BasePartObject):
                     magnet_depth=magnet_depth,
                     screw_rad=screw_rad,
                     screw_hole_count=screw_hole_count,
-                    counter_sink=counter_sink)
+                    counter_sink=counter_sink,
+                    short=short)
 
             if screw_hole_pattern_drawer and x_num > 2 and y_num > 2:
                 with Locations(faces().filter_by(Plane.XY).sort_by(Axis.Z)[0].center()):

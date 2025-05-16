@@ -13,7 +13,7 @@ def test_2x2_base():
                          screw_hole_count=2,
                          screw_hole_pattern_drawer=False,
                          corner_screw_hole_count=0)
-    float_eq(9425.715783704205, base.volume)
+    float_eq(9423.834706464077, base.volume)
 
 def test_1x1_base():
     base = Base.BaseGrid(1, 1,
@@ -24,7 +24,7 @@ def test_1x1_base():
                          screw_hole_count=2,
                          screw_hole_pattern_drawer=False,
                          corner_screw_hole_count=0)
-    float_eq(2384.7658445843413, base.volume)
+    float_eq(2383.825305964295, base.volume)
     
 def test_4_holes():
     base = Base.BaseGrid(2, 2,
@@ -35,7 +35,7 @@ def test_4_holes():
                          screw_hole_count=4,
                          screw_hole_pattern_drawer=False,
                          corner_screw_hole_count=0)
-    float_eq(10986.224490884395, base.volume)
+    float_eq(10984.343413653465, base.volume)
 
 def test_big_base():
     base = Base.BaseGrid(5, 5,
@@ -46,7 +46,7 @@ def test_big_base():
                          screw_hole_count=0,
                          screw_hole_pattern_drawer=False,
                          corner_screw_hole_count=0)
-    float_eq(48185.65844308989, base.volume)
+    float_eq(48180.955749932196, base.volume)
 
 def test_big_drawer_base():
     base = Base.BaseGrid(5, 5,
@@ -57,7 +57,7 @@ def test_big_drawer_base():
                          screw_hole_count=0,
                          screw_hole_pattern_drawer=True,
                          corner_screw_hole_count=0)
-    float_eq(48965.91279674202, base.volume)
+    float_eq(48961.210103592195, base.volume)
 
 def test_screw_holes():
     base = Base.BaseGrid(2, 2,
@@ -68,4 +68,4 @@ def test_screw_holes():
                          screw_hole_count=2,
                          screw_hole_pattern_drawer=False,
                          corner_screw_hole_count=0)
-    float_eq(9624.911063054498, base.volume)
+    float_eq(9623.029985813218, base.volume)

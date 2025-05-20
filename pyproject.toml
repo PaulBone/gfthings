@@ -11,6 +11,9 @@ classifiers = [
 ]
 packages = [{include = "gfthings"}]
 
+[tool.poetry.group.test.dependencies]
+pytest = "^8.3.5"
+
 [project.urls]
 Homepage = "https://github.com/PaulBone/gfthings"
 
@@ -23,6 +26,12 @@ gfedge = "gfthings.gfedge:main"
 [tool.poetry.dependencies]
 python = ">=3.10,<3.14"
 build123d = "^0.9.1"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = [
+    "tests",
+]
 
 [build-system]
 requires = ["poetry-core"]

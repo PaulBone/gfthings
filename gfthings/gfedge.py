@@ -25,6 +25,11 @@ def main(argv: list[str] | None = None):
         help="Output filename, defaults to `%(default)s'",
         default="edge.step")
     parser.add_argument(
+        "--loop",
+        help="Run in loop mode, generate many base files for different "
+        "configurations",
+        action="store_true") 
+    parser.add_argument(
         "-x",
         help="Gridfinity units across, defaults to '%(default)s'",
         default=4,
@@ -39,7 +44,22 @@ def main(argv: list[str] | None = None):
 
     edge = Edge(args.x, args.y)
 
-    if args.vscode:
+
+    if args.loop:
+        def make_variant(file_base, obj):
+            file = file_base + ".step"
+            print(f"Writing {file}")
+            export_step(obj, file)
+            file = file_base + ".stl"
+            print(f"Writing {file}")
+            export_stl(obj, file)
+            
+        for x in range(10, 42, 2):
+            for y in range(1, 6):
+                make_variant(f"edge-{x}x{y}",
+                             Edge(y, x))
+                    
+    elif args.vscode:
         from ocp_vscode import (show_object,
                                 set_port)
         set_port(args.vscode)

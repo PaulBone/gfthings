@@ -58,6 +58,8 @@ def main(argv: list[str] | None = None):
             for y in range(1, 6):
                 make_variant(f"edge-{x}x{y}",
                              Edge(y, x))
+                make_variant(f"edge-{x}x{y}-short",
+                             Edge(y, x, short=True))
 
     else:
         edge = Edge(args.x, args.y, short=args.short)

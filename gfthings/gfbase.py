@@ -85,6 +85,9 @@ def main(argv: list[str] | None = None):
                 for screw_count in [0, 2, 4]:
                     make_variant(f"base-{x}x{y}-s{screw_count}.step",
                                  BaseGrid(x, y, screw_hole_count=screw_count))
+                    if screw_count == 0:
+                        make_variant(f"base-{x}x{y}-short.step",
+                                     BaseGrid(x, y, screw_hole_count=0, short=True))
                 if (x > 3) and (y > 3):
                     make_variant(f"base-{x}x{y}-sd.step",
                                 BaseGrid(x, y, screw_hole_pattern_drawer=True))

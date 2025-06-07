@@ -183,6 +183,10 @@ boxes.
 
 ![](images/base-screws-drawer.png)
 
+If you don't need any screw holes then the base can be made shorter to save time, filament and height.
+
+    --short
+
 Base Edges
 ----------
 
@@ -193,6 +197,10 @@ I don't know about you but my drawers arn't multiples of 42mm and I don't want t
 Like before the -x parameter is in gridfinity units.  But the -y parameter is not!  It's in milimetres.
 
 ![](images/edge.png)
+
+Short variations of the edges to match the short base can be made with the --short option
+
+    gfedge --short -x 4 -y 10 -o edge.step
 
 Pins
 ----

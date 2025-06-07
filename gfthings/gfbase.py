@@ -68,21 +68,32 @@ def main(argv: list[str] | None = None):
         help="Place four screw holes (in addition to --screw-hole-count) " +
         "in a minimal pattern for installation into drawers. ",
         action="store_true")
-    
+    parser.add_argument(
+        "--short",
+        help="Make the short variant, doesn't support screw holes",
+        action="store_true")
+
     args = parser.parse_args(argv)
 
     if args.loop:
-        def make_variant(file, obj):
+        def make_variant(file_base, obj):
+            file = file_base + ".step"
             print(f"Writing {file}")
             export_step(obj, file)
+            file = file_base + ".stl"
+            print(f"Writing {file}")
+            export_stl(obj, file)
 
         for x in range(1, 6):
             for y in range(1, 6):
                 for screw_count in [0, 2, 4]:
-                    make_variant(f"base-{x}x{y}-s{screw_count}.step",
+                    make_variant(f"base-{x}x{y}-s{screw_count}",
                                  BaseGrid(x, y, screw_hole_count=screw_count))
+                    if screw_count == 0:
+                        make_variant(f"base-{x}x{y}-short",
+                                     BaseGrid(x, y, screw_hole_count=0, short=True))
                 if (x > 3) and (y > 3):
-                    make_variant(f"base-{x}x{y}-sd.step",
+                    make_variant(f"base-{x}x{y}-sd",
                                 BaseGrid(x, y, screw_hole_pattern_drawer=True))
 
     else:
@@ -91,15 +102,16 @@ def main(argv: list[str] | None = None):
         screw_rad = args.screw_diameter/2
         magnet_rad = args.magnet_diameter/2
         magnet_depth = args.magnet_depth
-        #counter_sink = bool(args.countersink)
         counter_sink = False
+        screw_hole_count = 2 if not args.short else 0
         base = BaseGrid(x, y,
                         screw_rad=screw_rad,
                         magnet_rad=magnet_rad,
                         magnet_depth=magnet_depth,
                         counter_sink=counter_sink,
-                        screw_hole_count=args.screw_hole_count,
-                        screw_hole_pattern_drawer=args.screw_hole_pattern_drawer)
+                        screw_hole_count=screw_hole_count,
+                        screw_hole_pattern_drawer=args.screw_hole_pattern_drawer,
+                        short=args.short)
 
         if args.vscode:
             from ocp_vscode import show, set_port

@@ -5,7 +5,13 @@ bin_size = 42
 plate_height_a = 0.8
 plate_height_b = 1.8
 plate_height_c = 2.15
-plate_base_height = 2.9
+
+def plate_base_height(short):
+    if short:
+        return 0.8
+    else:
+        return 2.9
+    
 plate_height = plate_height_a + plate_height_b + plate_height_c
 outer_rad = 7.5/2
 base_outer_dia = 8

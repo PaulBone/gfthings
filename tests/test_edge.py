@@ -16,3 +16,7 @@ def test_long_edge():
 def test_narrow_edge():
     edge = Edge(2, 12)
     float_eq(1957.3276090903773, edge.volume)
+
+def test_short_edge():
+    edge = Edge(2, 12, short=True)
+    float_eq(1040.5549203673213, edge.volume)

@@ -1,3 +1,4 @@
 *.step
+*.stl
 __pycache__
 .venv

@@ -39,12 +39,12 @@ def main(argv: list[str] | None = None):
         help="Depth of edge spacer in millimeters, defaults to '%(default)s'",
         default=16,
         type=float)
-
+    parser.add_argument(
+        "--short",
+        help="Make the short variant, doesn't support screw holes",
+        action="store_true")
     args = parser.parse_args(argv)
-
-    edge = Edge(args.x, args.y)
-
-
+        
     if args.loop:
         def make_variant(file_base, obj):
             file = file_base + ".step"
@@ -58,20 +58,23 @@ def main(argv: list[str] | None = None):
             for y in range(1, 6):
                 make_variant(f"edge-{x}x{y}",
                              Edge(y, x))
-                    
-    elif args.vscode:
-        from ocp_vscode import (show_object,
-                                set_port)
-        set_port(args.vscode)
-        show_object(edge)
+
     else:
-        if args.output.endswith(".step"):
-            export_step(bin, args.output)
-        elif args.output.endswith('.stl'):
-            export_stl(bin, args.output)
+        edge = Edge(args.x, args.y, short=args.short)
+                    
+        if args.vscode:
+            from ocp_vscode import (show_object,
+                                    set_port)
+            set_port(args.vscode)
+            show_object(edge)
         else:
-            print("Unknown output format.")
-            exit(1)
+            if args.output.endswith(".step"):
+                export_step(bin, args.output)
+            elif args.output.endswith('.stl'):
+                export_stl(bin, args.output)
+            else:
+                print("Unknown output format.")
+                exit(1)
 
 if __name__ == "__main__":
     import sys

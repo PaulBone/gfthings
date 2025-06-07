@@ -91,7 +91,6 @@ def main(argv: list[str] | None = None):
         screw_rad = args.screw_diameter/2
         magnet_rad = args.magnet_diameter/2
         magnet_depth = args.magnet_depth
-        #counter_sink = bool(args.countersink)
         counter_sink = False
         base = BaseGrid(x, y,
                         screw_rad=screw_rad,

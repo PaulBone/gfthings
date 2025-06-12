@@ -71,9 +71,9 @@ def main(argv: list[str] | None = None):
             show_object(edge)
         else:
             if args.output.endswith(".step"):
-                export_step(bin, args.output)
+                export_step(edge, args.output)
             elif args.output.endswith('.stl'):
-                export_stl(bin, args.output)
+                export_stl(edge, args.output)
             else:
                 print("Unknown output format.")
                 exit(1)

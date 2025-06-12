@@ -119,9 +119,9 @@ def main(argv: list[str] | None = None):
             show(base)
         else:
             if args.output.endswith(".step"):
-                export_step(bin, args.output)
+                export_step(base, args.output)
             elif args.output.endswith('.stl'):
-                export_stl(bin, args.output)
+                export_stl(base, args.output)
             else:
                 print("Unknown output format.")
                 exit(1)

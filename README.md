@@ -37,7 +37,7 @@ Bins are gridfinity bins.  They are inspired by
 [Pred's bins](https://www.printables.com/model/592545-gridfinity-bin-with-printable-label-by-pred-parame)
 and include the same label shelf.
 They are easy to print (overhangs and bridges are minimised) and can be
-generated in a mumber of custom sizes with and without dividers.  For more
+generated in a number of custom sizes with and without dividers.  For more
 information see:
 
     gfbin -h

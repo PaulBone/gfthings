@@ -69,6 +69,11 @@ help you get small parts out.  This one has a 10mm radius, the default is
 12.5mm.  Use -s 0 for no scoop at the front at all, eg if you want to store
 larger items.
 
+If something you're storing is a tight fit try removing the stacking lip,
+and if it's still a tight fit, you can probably take 0.4mm off each wall:
+
+    gfbin --no-label -s 0 --no-lip --wall-thickness 0.8
+
 Magnet holes
 ------------
 

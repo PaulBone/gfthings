@@ -159,6 +159,7 @@ class Bin(BasePartObject):
                  magnet_depth : float = 2,
                  half_grid : bool = False,
                  wall_thickness : float = 1.2,
+                 lip : bool = True,
                  rotation: tuple[float, float, float] | Rotation = (0, 0, 0),
                  label: bool = True,
                  align: Align | tuple[Align, Align, Align] = None,
@@ -228,9 +229,10 @@ class Bin(BasePartObject):
                           wall_thickness, shelf_clearance,
                           align=(Align.CENTER, Align.MIN, Align.MIN)) 
 
-            with Locations((0, 0, wall_height/2 + plate_height)):
-                BinLip(width, depth, shelf_clearance=shelf_clearance,
-                       align=(Align.CENTER, Align.CENTER, Align.MAX))
+            if lip:
+                with Locations((0, 0, wall_height/2 + plate_height)):
+                    BinLip(width, depth, shelf_clearance=shelf_clearance,
+                        align=(Align.CENTER, Align.CENTER, Align.MAX))
             
             if label:
                 with Locations(Plane(origin=faces().filter_by(Plane.XZ)

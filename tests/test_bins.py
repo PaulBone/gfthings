@@ -47,3 +47,7 @@ def test_half():
                   half_grid=True)
     float_eq(18596.997883502943, bin.volume)
     
+def test_nolip():
+    bin = Bin.Bin(1, 1, 4, scoop_rad=0, divisions=1,
+                  label=False, lip=False)
+    float_eq(10817.207884007077, bin.volume)

@@ -58,6 +58,10 @@ def main(argv: list[str] | None = None):
         help="Don't add a shelf for the label",
         action="store_true")
     parser.add_argument(
+        "--no-lip",
+        help="Don't add the stacking lip",
+        action="store_true")
+    parser.add_argument(
         "--unrefined",
         help="Use unrefined magnet holes. " +
             "Gridfinity Refind " + 
@@ -153,6 +157,7 @@ def main(argv: list[str] | None = None):
         bin = Bin(x, y, z, scoop,
               divisions=divisions,
               label=not args.no_label,
+              lip=not args.no_lip,
               refined=not args.unrefined,
               magnet_dia=args.magnet_dia,
               magnet_depth=args.magnet_height,

@@ -10,6 +10,7 @@ from gfthings.parameters import *
 class GFProfile(BasePartObject):
     def __init__(self, width : float = 1,
                        depth : float = 1,
+                       bin_size : float = 42,
                        clearance : float = 0,
                        corner_dia : float = base_outer_dia,
                        base : float = 0,
@@ -62,9 +63,14 @@ class GFProfilePlate(BasePartObject):
         super().__init__(p.part, rotation, align, mode)
 
 class GFProfileBin(BasePartObject):
-    def __init__(self, rotation: tuple[float, float, float] | Rotation = (0, 0, 0), align: Align | tuple[Align, Align, Align] = None, mode: Mode = Mode.ADD):
+    def __init__(self,
+                 bin_size : float = 42, 
+                 rotation: tuple[float, float, float] | Rotation = (0, 0, 0), align: Align | tuple[Align, Align, Align] = None, mode: Mode = Mode.ADD):
         with BuildPart() as p:
-            GFProfile(clearance=0.25, inner_clearance=0, corner_dia=7.5)
+            GFProfile(bin_size=bin_size, 
+                      clearance=0.25, 
+                      inner_clearance=0, 
+                      corner_dia=7.5)
         super().__init__(p.part, rotation, align, mode)
 
 class GFProfileLip(BasePartObject):

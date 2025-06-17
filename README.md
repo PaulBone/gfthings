@@ -88,6 +88,10 @@ over from another project?
 Or maybe you don't want "gridfinity refined" style magnet holes.  Try
 `--unrefined`.
 
+If you're not into magnets at all, then maybe you want half-grid bins.
+
+    gfbin --half-grid
+
 You can make bins of any size, units are specified in "gridfinity units",
 that's 42mm across and back-to-front. Up and down is 7mm per unit
 plus the base.

@@ -42,11 +42,12 @@ class BinBase(BasePartObject):
                  refined: bool,
                  magnet_dia: float,
                  magnet_depth: float,
+                 bin_size: float = 42,
                  rotation: tuple[float, float, float] | Rotation = (0, 0, 0),
                  align: Align | tuple[Align, Align, Align] = None,
                  mode: Mode = Mode.ADD):
         with BuildPart() as p:
-            GFProfileBin()
+            GFProfileBin(bin_size=bin_size)
             if refined:
                 with Locations(faces().filter_by(Plane.XY).sort_by(Axis.Z)[0]):
                     with PolarLocations(0, 4):
@@ -156,6 +157,7 @@ class Bin(BasePartObject):
                  refined : bool = True,
                  magnet_dia : float = 6,
                  magnet_depth : float = 2,
+                 half_grid : bool = False,
                  wall_thickness : float = 1.2,
                  rotation: tuple[float, float, float] | Rotation = (0, 0, 0),
                  label: bool = True,
@@ -171,8 +173,16 @@ class Bin(BasePartObject):
             Box(box_width, box_depth, wall_height)
             fillet(edges().filter_by(Axis.Z), radius=outer_rad)
             with Locations((0, 0, -wall_height/2)):
-                with GridLocations(bin_size, bin_size, width, depth):
+                bs = bin_size
+                w = width
+                d = depth
+                if half_grid:
+                    bs /= 2
+                    w *= 2
+                    d *= 2
+                with GridLocations(bs, bs, w, d):
                     BinBase(refined=refined,
+                            bin_size = 42 if not half_grid else 21,
                             magnet_dia=magnet_dia,
                             magnet_depth=magnet_depth,
                             align=(Align.CENTER, Align.CENTER, Align.MAX))
@@ -185,7 +195,7 @@ class Bin(BasePartObject):
                                     wall_thickness)
             
             inner_height = wall_height
-            if width > 1 or depth > 1:
+            if width > 1 or depth > 1 or half_grid:
                 # For a bin that covers more than one square we need a floor 
                 # to connect the squares.
                 inner_height -= wall_thickness

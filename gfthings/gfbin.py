@@ -80,6 +80,13 @@ def main(argv: list[str] | None = None):
         type=float,
         default=2)
     parser.add_argument(
+        "--half-grid",
+        help="The base of the bin will fit on a 'half grid' " +
+             "that is, 21mm per X/Y gridfinity unit will be " +
+             "used for the base, the normal 42mm will be used " +
+             "for everything else.  Magnet holes may be broken.",
+        action="store_true")
+    parser.add_argument(
         "--wall-thickness",
         help="Thickness of bin walls, " +
              "you might adjust this if printing with " +
@@ -140,6 +147,7 @@ def main(argv: list[str] | None = None):
                        refined=not args.unrefined,
                        magnet_dia=args.magnet_dia,
                        magnet_depth=args.magnet_height,
+                       half_grid=args.half_grid,
                        wall_thickness=args.wall_thickness)
     else:
         bin = Bin(x, y, z, scoop,
@@ -148,6 +156,7 @@ def main(argv: list[str] | None = None):
               refined=not args.unrefined,
               magnet_dia=args.magnet_dia,
               magnet_depth=args.magnet_height,
+              half_grid=args.half_grid,
               wall_thickness=args.wall_thickness)
     
     if args.loop:

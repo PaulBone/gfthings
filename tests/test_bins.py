@@ -39,3 +39,8 @@ def test_scoop():
     bin2 = Bin.Bin(1, 1, 5, scoop_rad=12, divisions=1, label=False)
     float_eq(16237.95684535477, bin2.volume)
 
+def test_half():
+    bin = Bin.Bin(1, 1, 4, scoop_rad=0, divisions=1, label=False,
+                  half_grid=True)
+    float_eq(13252.86144442649, bin.volume)
+

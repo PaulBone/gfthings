@@ -4,7 +4,7 @@
 from argparse import ArgumentParser
 from build123d import *
 
-from gfthings.Bin import (Bin, FunkyBin)
+from gfthings.Bin import (Bin, FunkyBin, HalfWallBin)
 
 def main(argv: list[str] | None = None):
     parser = ArgumentParser(
@@ -60,6 +60,12 @@ def main(argv: list[str] | None = None):
     parser.add_argument(
         "--no-lip",
         help="Don't add the stacking lip",
+        action="store_true")
+    parser.add_argument(
+        "--half-wall",
+        help="Generate a bin with just under half its walls removed." + \
+            "Useful for placing two such bins end-to-end to create " +
+            "larger storage.",
         action="store_true")
     parser.add_argument(
         "--unrefined",
@@ -182,6 +188,16 @@ def main(argv: list[str] | None = None):
                         magnet_depth=args.magnet_height,
                         half_grid=args.half_grid,
                         wall_thickness=args.wall_thickness)
+        elif args.half_wall:
+            bin = HalfWallBin(x, y, z,
+                divisions=divisions,
+                lip=not args.no_lip,
+                refined=not args.unrefined,
+                magnet_dia=args.magnet_dia,
+                magnet_depth=args.magnet_height,
+                half_grid=args.half_grid,                
+                wall_thickness=args.wall_thickness)
+
         else:
             bin = Bin(x, y, z, scoop,
                 divisions=divisions,

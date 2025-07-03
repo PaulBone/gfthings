@@ -4,7 +4,7 @@
 from argparse import ArgumentParser
 from build123d import *
 
-from Bin import (Bin, FunkyBin)
+from .Bin import (Bin, FunkyBin)
 
 def main(argv: list[str] | None = None):
     parser = ArgumentParser(

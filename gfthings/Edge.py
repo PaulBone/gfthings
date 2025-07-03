@@ -5,8 +5,8 @@ from build123d import *
 from build123d.build_enums import Align, Mode
 from build123d.topology import Part, Solid
 
-from parameters import *
-from Base import *
+from .parameters import *
+from .Base import *
 
 class EdgeSpacer(BasePartObject):
     def __init__(self, space : float, short : bool = False, crossbar : bool = False,

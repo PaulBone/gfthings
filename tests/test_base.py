@@ -1,9 +1,6 @@
 # Copyright (C) Paul Bone
 # CC BY-NC-SA 4.0
 
-import sys
-sys.path.append("gfthings/")
-
 import gfthings.Base as Base
 from Utils import float_eq
 

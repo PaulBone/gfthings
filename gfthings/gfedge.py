@@ -7,7 +7,7 @@
 from argparse import ArgumentParser
 from build123d import *
 
-from Edge import Edge
+from .Edge import Edge
 
 def main(argv: list[str] | None = None):
     parser = ArgumentParser(

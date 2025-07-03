@@ -1,8 +1,6 @@
 # Copyright (C) Paul Bone
 # CC BY-NC-SA 4.0
 
-import sys
-sys.path.append("gfthings/")
 import gfthings.Bin as Bin
 
 from Utils import float_eq

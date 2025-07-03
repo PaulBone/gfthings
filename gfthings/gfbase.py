@@ -4,8 +4,8 @@
 from argparse import ArgumentParser
 from build123d import *
 
-from parameters import *
-from Base import *
+from .parameters import *
+from .Base import *
 
 def main(argv: list[str] | None = None):
     parser = ArgumentParser(

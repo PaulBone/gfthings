@@ -45,6 +45,9 @@ information see:
 ![](images/bin-render.png)
 ![](images/bin-irl.jpeg)
 
+Features
+--------
+
 The bins have a label shelf, of course you could use a label maker and stick
 on a lable.
 Or 3D print a label with Nick's excellent
@@ -65,6 +68,9 @@ The -s is for scoop radius.  A little scoop in the front of the bin will
 help you get small parts out.  This one has a 10mm radius, the default is
 12.5mm.  Use -s 0 for no scoop at the front at all, eg if you want to store
 larger items.
+
+Magnet holes
+------------
 
 Bins are generated with
 [Gridfinity Refined](https://www.printables.com/model/413761-gridfinity-refined)
@@ -87,6 +93,9 @@ over from another project?
 
 Or maybe you don't want "gridfinity refined" style magnet holes.  Try
 `--unrefined`.
+
+Sizes
+-----
 
 You can make bins of any size, units are specified in "gridfinity units",
 that's 42mm across and back-to-front. Up and down is 7mm per unit

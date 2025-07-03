@@ -5,7 +5,7 @@ import math
 
 from build123d.topology import Part, Solid
 
-from gfthings.parameters import *
+from parameters import *
 
 class Pin(BasePartObject):
     def __init__(self, 

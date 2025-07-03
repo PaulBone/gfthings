@@ -7,7 +7,7 @@
 from argparse import ArgumentParser
 from build123d import *
 
-from gfthings.Pin import Pin
+from Pin import Pin
 
 def main(argv: list[str] | None = None):
     parser = ArgumentParser(

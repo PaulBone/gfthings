@@ -5,7 +5,7 @@ from build123d import *
 from build123d.build_enums import Align, Mode
 from build123d.topology import Part, Solid
 
-from gfthings.parameters import *
+from parameters import *
 
 class GFProfile(BasePartObject):
     def __init__(self, width : float = 1,

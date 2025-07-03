@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gfthings"
-version = "0.7.1"
+version = "0.7.2"
 description = "Paul's Gridfinity Things"
 authors = ["Paul Bone <paul@bone.id.au>"]
 license = "CC BY-NC-SA 4.0"

@@ -5,8 +5,8 @@ from build123d import *
 from build123d.build_enums import Align, Mode
 from build123d.topology import Part, Solid
 
-from gfthings.parameters import *
-from gfthings.GFProfile import GFProfilePlate
+from parameters import *
+from GFProfile import GFProfilePlate
 
 class ScrewSupport(BasePartObject):
     def __init__(self,

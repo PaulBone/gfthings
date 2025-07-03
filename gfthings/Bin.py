@@ -5,8 +5,8 @@ from build123d import *
 from build123d.build_enums import Align, Mode
 from build123d.topology import Part, Solid
 
-from gfthings.parameters import *
-from gfthings.GFProfile import GFProfileBin, GFProfileLip
+from parameters import *
+from GFProfile import GFProfileBin, GFProfileLip
 
 class RefinedMagnetHole(BasePartObject):
     def __init__(self,

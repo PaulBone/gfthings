@@ -2,6 +2,9 @@
 # Copyright (C) Paul Bone
 # CC BY-NC-SA 4.0
 
+import sys
+sys.path.append("gfthings/")
+
 from gfthings.Edge import Edge
 from Utils import float_eq
 

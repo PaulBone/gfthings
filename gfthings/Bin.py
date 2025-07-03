@@ -180,7 +180,7 @@ class Bin(BasePartObject):
                     bs /= 2
                     w *= 2
                     d *= 2
-                with GridLocations(bs, bs, w, d):
+                with GridLocations(bs, bs, int(w), int(d)):
                     BinBase(refined=refined,
                             bin_size = 42 if not half_grid else 21,
                             magnet_dia=magnet_dia,
@@ -322,9 +322,10 @@ class FunkyBin(BasePartObject):
         super().__init__(p.part, rotation, align, mode)
 
 if __name__ == "__main__":
-    test = Bin(1, 1, 4,
+    test = Bin(1, 1.5, 4,
                scoop_rad=10.0,
-               wall_thickness=0.6)
+               wall_thickness=0.6,
+               half_grid=True)
     from ocp_vscode import (show_object,
                             set_port)
     set_port(3939)

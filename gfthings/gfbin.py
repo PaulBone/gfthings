@@ -107,8 +107,8 @@ def main(argv: list[str] | None = None):
         default="")
     
     args = parser.parse_args(argv)
-    x = int(args.x)
-    y = int(args.y)
+    x = float(args.x)
+    y = float(args.y)
     z = int(args.z)
     scoop = float(args.scoop)
     divisions = int(args.divisions)

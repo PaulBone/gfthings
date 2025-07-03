@@ -43,4 +43,7 @@ def test_half():
     bin = Bin.Bin(1, 1, 4, scoop_rad=0, divisions=1, label=False,
                   half_grid=True)
     float_eq(13252.86144442649, bin.volume)
-
+    bin = Bin.Bin(1.5, 1, 4, scoop_rad=0, divisions=1, label=False,
+                  half_grid=True)
+    float_eq(18596.997883502943, bin.volume)
+    

@@ -111,59 +111,7 @@ def main(argv: list[str] | None = None):
         default="")
     
     args = parser.parse_args(argv)
-    x = float(args.x)
-    y = float(args.y)
-    z = int(args.z)
-    scoop = float(args.scoop)
-    divisions = int(args.divisions)
 
-    bin = None
-    funky = args.funky
-    if funky != "":
-        if funky == "donut":
-            funky_expr = [[True, True, True], 
-                          [True, False, True],
-                          [True, True, True]]
-        elif funky == "cross":
-            funky_expr = [[False, True, False],
-                          [True, True, True],
-                          [False, True, False]]
-        elif funky == "tetris_l":
-            funky_expr = [[True, False],
-                          [True, False],
-                          [True, True]]
-        elif funky == "tetris_j":
-            funky_expr = [[False, True],
-                          [False, True],
-                          [True, True]]
-        elif funky == "tetris_t":
-            funky_expr = [[False, True, False],
-                          [True, True, True]]
-        elif funky == "tetris_s":
-            funky_expr = [[False, True, True],
-                          [True, True, False]]
-        elif funky == "tetris_z":
-            funky_expr =[[True, True, False],
-                         [False, True, True]]
-        else:
-            funky_expr = eval(args.funky)
-        bin = FunkyBin(list(reversed(funky_expr)), z,
-                       refined=not args.unrefined,
-                       magnet_dia=args.magnet_dia,
-                       magnet_depth=args.magnet_height,
-                       half_grid=args.half_grid,
-                       wall_thickness=args.wall_thickness)
-    else:
-        bin = Bin(x, y, z, scoop,
-              divisions=divisions,
-              label=not args.no_label,
-              lip=not args.no_lip,
-              refined=not args.unrefined,
-              magnet_dia=args.magnet_dia,
-              magnet_depth=args.magnet_height,
-              half_grid=args.half_grid,
-              wall_thickness=args.wall_thickness)
-    
     if args.loop:
         from pathlib import Path
         for z in (3, 4, 5, 6):
@@ -191,21 +139,74 @@ def main(argv: list[str] | None = None):
                                     export_stl(bin, str(file_stl))
                                 if not file_step.exists():
                                     export_step(bin, str(file_step))
-
-    if args.vscode:
-        from ocp_vscode import (show_object,
-                                set_port)
-        set_port(args.vscode)
-        show_object(bin, "bin")
     else:
-        if args.output.endswith(".step"):
-            export_step(bin, args.output)
-        elif args.output.endswith('.stl'):
-            export_stl(bin, args.output)
+        x = float(args.x)
+        y = float(args.y)
+        z = int(args.z)
+        scoop = float(args.scoop)
+        divisions = int(args.divisions)
+
+        bin = None
+        funky = args.funky
+        if funky != "":
+            if funky == "donut":
+                funky_expr = [[True, True, True], 
+                            [True, False, True],
+                            [True, True, True]]
+            elif funky == "cross":
+                funky_expr = [[False, True, False],
+                            [True, True, True],
+                            [False, True, False]]
+            elif funky == "tetris_l":
+                funky_expr = [[True, False],
+                            [True, False],
+                            [True, True]]
+            elif funky == "tetris_j":
+                funky_expr = [[False, True],
+                            [False, True],
+                            [True, True]]
+            elif funky == "tetris_t":
+                funky_expr = [[False, True, False],
+                            [True, True, True]]
+            elif funky == "tetris_s":
+                funky_expr = [[False, True, True],
+                            [True, True, False]]
+            elif funky == "tetris_z":
+                funky_expr =[[True, True, False],
+                            [False, True, True]]
+            else:
+                funky_expr = eval(args.funky)
+            bin = FunkyBin(list(reversed(funky_expr)), z,
+                        refined=not args.unrefined,
+                        magnet_dia=args.magnet_dia,
+                        magnet_depth=args.magnet_height,
+                        half_grid=args.half_grid,
+                        wall_thickness=args.wall_thickness)
         else:
-            print("Unknown output format.")
-            exit(1)
+            bin = Bin(x, y, z, scoop,
+                divisions=divisions,
+                label=not args.no_label,
+                lip=not args.no_lip,
+                refined=not args.unrefined,
+                magnet_dia=args.magnet_dia,
+                magnet_depth=args.magnet_height,
+                half_grid=args.half_grid,
+                wall_thickness=args.wall_thickness)
         
+        if args.vscode:
+            from ocp_vscode import (show_object,
+                                    set_port)
+            set_port(args.vscode)
+            show_object(bin, "bin")
+        else:
+            if args.output.endswith(".step"):
+                export_step(bin, args.output)
+            elif args.output.endswith('.stl'):
+                export_stl(bin, args.output)
+            else:
+                print("Unknown output format.")
+                exit(1)
+
 if __name__ == "__main__":
     import sys
     main(sys.argv[1:])

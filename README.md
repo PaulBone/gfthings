@@ -74,6 +74,16 @@ and if it's still a tight fit, you can probably take 0.4mm off each wall:
 
     gfbin --no-label -s 0 --no-lip --wall-thickness 0.8
 
+![](images/bin-half-wall.png)
+
+What if you want to store chopsticks, but your chopsticks are longer than
+your printer bed.  Print two bins with some of the walls removed
+(--half-wall) and place them next to each -other.  The scope gives a
+convenient place to put your hand to pick up the chopsticks.  Scoops and
+labels are not supported on half-wall bins.
+
+    gfbin -x 1 -y 4 --half-wall
+
 Magnet holes
 ------------
 

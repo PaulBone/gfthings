@@ -323,6 +323,43 @@ class FunkyBin(BasePartObject):
 
         super().__init__(p.part, rotation, align, mode)
 
+class HalfWallBin(BasePartObject):
+    def __init__(self, x, y, z,
+                 divisions : int = 1,
+                 lip : bool = True,
+                 refined : bool = True,
+                 half_grid : bool = False,
+                 wall_thickness : float = 1.2,
+                 magnet_dia : float = 6,
+                 magnet_depth : float = 3,
+                 rotation = (0, 0, 0), align = None, mode = Mode.ADD):
+        with BuildPart() as p:
+            Bin(x, y, z,
+                divisions=divisions,
+                lip=lip,
+                refined=refined,
+                magnet_dia=magnet_dia,
+                magnet_depth=magnet_depth,
+                scoop_rad=0,
+                label=False,
+                wall_thickness=wall_thickness,
+                half_grid=half_grid)
+            side = faces().filter_by(Plane.YZ).sort_by(Axis.X)[0]
+            # TODO: These values were found exprimentaly, I really should measure.
+            lip_height = 1.35 if lip else 3.725
+            with BuildSketch(side):
+                with BuildLine():
+                    Polyline((z*7/2 + lip_height, 0),
+                            (z*7/2 + lip_height, y/2*bin_size),
+                            (-z*7/2 + lip_height, y/2*bin_size),
+                            (-z*7/2 + lip_height    , 0),
+                            close=True)
+                    fillet(vertices().group_by(Axis.X)[0].sort_by(Axis.Y)[0],
+                        radius=min(bin_size, z*7))
+                make_face()
+            extrude(amount=-bin_size * x, mode=Mode.SUBTRACT)
+        super().__init__(p.part, rotation, align, mode)
+
 if __name__ == "__main__":
     test = Bin(1, 1.5, 4,
                scoop_rad=10.0,

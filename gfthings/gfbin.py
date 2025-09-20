@@ -70,7 +70,7 @@ def main(argv: list[str] | None = None):
     parser.add_argument(
         "--unrefined",
         help="Use unrefined magnet holes. " +
-            "Gridfinity Refind " + 
+            "Gridfinity Refined " +
             "https://www.printables.com/model/413761-gridfinity-refined " +
             "has improved magnet holes that don't require glue, " +
             "If for some reason you don't want superiour magnet holes then " +
@@ -89,6 +89,10 @@ def main(argv: list[str] | None = None):
              "(default %(default)s)",
         type=float,
         default=2)
+    parser.add_argument(
+        "--no-magnets",
+        help="Don't add holes for magnets.",
+        action="store_true")
     parser.add_argument(
         "--half-grid",
         help="The base of the bin will fit on a 'half grid' " +
@@ -183,6 +187,7 @@ def main(argv: list[str] | None = None):
             else:
                 funky_expr = eval(args.funky)
             bin = FunkyBin(list(reversed(funky_expr)), z,
+                        magnets=not args.no_magnets,
                         refined=not args.unrefined,
                         magnet_dia=args.magnet_dia,
                         magnet_depth=args.magnet_height,
@@ -192,6 +197,7 @@ def main(argv: list[str] | None = None):
             bin = HalfWallBin(x, y, z,
                 divisions=divisions,
                 lip=not args.no_lip,
+                magnets=not args.no_magnets,
                 refined=not args.unrefined,
                 magnet_dia=args.magnet_dia,
                 magnet_depth=args.magnet_height,
@@ -203,6 +209,7 @@ def main(argv: list[str] | None = None):
                 divisions=divisions,
                 label=not args.no_label,
                 lip=not args.no_lip,
+                magnets=not args.no_magnets,
                 refined=not args.unrefined,
                 magnet_dia=args.magnet_dia,
                 magnet_depth=args.magnet_height,

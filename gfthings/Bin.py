@@ -39,6 +39,7 @@ class RefinedMagnetHole(BasePartObject):
 
 class BinBase(BasePartObject):
     def __init__(self,
+                 magnets: bool,
                  refined: bool,
                  magnet_dia: float,
                  magnet_depth: float,
@@ -48,20 +49,21 @@ class BinBase(BasePartObject):
                  mode: Mode = Mode.ADD):
         with BuildPart() as p:
             GFProfileBin(bin_size=bin_size)
-            if refined:
-                with Locations(faces().filter_by(Plane.XY).sort_by(Axis.Z)[0]):
-                    with PolarLocations(0, 4):
-                        with Locations((35.6/2-4.8+magnet_dia/2, 35.6/2+0.8+2.15)):
-                            RefinedMagnetHole(magnet_h=magnet_depth,
-                                              magnet_w=magnet_dia,
-                                              mode=Mode.SUBTRACT,
-                                              align=(Align.MAX, Align.MIN, Align.MIN),
-                                              rotation=(180, 0, 0))
-            else:
-                with Locations(faces().filter_by(Plane.XY).sort_by(Axis.Z)[0]):
-                    magnet_offset = 35.6/2 - 4.8
-                    with GridLocations(magnet_offset*2, magnet_offset*2, 2, 2):
-                        Hole(magnet_dia/2, magnet_depth)                
+            if magnets:
+                if refined:
+                    with Locations(faces().filter_by(Plane.XY).sort_by(Axis.Z)[0]):
+                        with PolarLocations(0, 4):
+                            with Locations((35.6/2-4.8+magnet_dia/2, 35.6/2+0.8+2.15)):
+                                RefinedMagnetHole(magnet_h=magnet_depth,
+                                                magnet_w=magnet_dia,
+                                                mode=Mode.SUBTRACT,
+                                                align=(Align.MAX, Align.MIN, Align.MIN),
+                                                rotation=(180, 0, 0))
+                else:
+                    with Locations(faces().filter_by(Plane.XY).sort_by(Axis.Z)[0]):
+                        magnet_offset = 35.6/2 - 4.8
+                        with GridLocations(magnet_offset*2, magnet_offset*2, 2, 2):
+                            Hole(magnet_dia/2, magnet_depth)
             
         super().__init__(p.part, rotation, align, mode)
 
@@ -154,6 +156,7 @@ class Bin(BasePartObject):
                  height_units : int,
                  scoop_rad : float,
                  divisions : int = 1,
+                 magnets : bool = True,
                  refined : bool = True,
                  magnet_dia : float = 6,
                  magnet_depth : float = 2,
@@ -182,7 +185,8 @@ class Bin(BasePartObject):
                     w *= 2
                     d *= 2
                 with GridLocations(bs, bs, int(w), int(d)):
-                    BinBase(refined=refined,
+                    BinBase(magnets=magnets,
+                            refined=refined,
                             bin_size = 42 if not half_grid else 21,
                             magnet_dia=magnet_dia,
                             magnet_depth=magnet_depth,
@@ -267,6 +271,7 @@ class FunkyBin(BasePartObject):
     def __init__(self,
                  array : list,
                  height_units : int,
+                 magnets: bool = True,
                  refined : bool = True,
                  magnet_dia : float = 6,
                  magnet_depth : float = 2,
@@ -309,7 +314,8 @@ class FunkyBin(BasePartObject):
                         with Locations(((x - width/2 + 1/2)*bin_size,
                                         (y - depth/2 + 1/2)*bin_size,
                                         -wall_height/2)):
-                            BinBase(refined=refined,
+                            BinBase(magnets=magnets,
+                                    refined=refined,
                                     magnet_depth=magnet_depth,
                                     magnet_dia=magnet_dia,
                                     align=(Align.CENTER, Align.CENTER, Align.MAX))
@@ -327,6 +333,7 @@ class HalfWallBin(BasePartObject):
     def __init__(self, x, y, z,
                  divisions : int = 1,
                  lip : bool = True,
+                 magnets: bool = True,
                  refined : bool = True,
                  half_grid : bool = False,
                  wall_thickness : float = 1.2,
@@ -337,6 +344,7 @@ class HalfWallBin(BasePartObject):
             Bin(x, y, z,
                 divisions=divisions,
                 lip=lip,
+                magnets=magnets,
                 refined=refined,
                 magnet_dia=magnet_dia,
                 magnet_depth=magnet_depth,

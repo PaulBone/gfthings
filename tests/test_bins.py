@@ -51,3 +51,8 @@ def test_nolip():
     bin = Bin.Bin(1, 1, 4, scoop_rad=0, divisions=1,
                   label=False, lip=False)
     float_eq(10817.207884007077, bin.volume)
+
+def test_nomagnets():
+    bin = Bin.Bin(1,1,4, scoop_rad = 0, divisions=1, label=False, 
+                  magnets=False)
+    float_eq(12809.05971822781, bin.volume)

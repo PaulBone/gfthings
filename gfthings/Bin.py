@@ -162,6 +162,7 @@ class Bin(BasePartObject):
                  lip : bool = True,
                  rotation: tuple[float, float, float] | Rotation = (0, 0, 0),
                  label: bool = True,
+                 solid: bool = False,
                  align: Align | tuple[Align, Align, Align] = None,
                  mode: Mode = Mode.ADD):
         import math
@@ -188,46 +189,47 @@ class Bin(BasePartObject):
                             magnet_depth=magnet_depth,
                             align=(Align.CENTER, Align.CENTER, Align.MAX))
             
-            inner_width = width * bin_size - bin_clearance*2 - wall_thickness*2
-            inner_depth = depth * bin_size - bin_clearance*2 - wall_thickness*2
-            with BuildSketch(faces().filter_by(Plane.XY).sort_by(Axis.Z)[-1]):
-                RectangleRounded(inner_width, inner_depth,
-                                 radius=outer_rad - bin_clearance -
-                                    wall_thickness)
-            
-            inner_height = wall_height
-            if width > 1 or depth > 1 or half_grid:
-                # For a bin that covers more than one square we need a floor 
-                # to connect the squares.
-                inner_height -= wall_thickness
-            extrude(amount=-inner_height, mode=Mode.SUBTRACT)
-            
-            inner_front_centre = faces().filter_by(Plane.XY) \
-                .sort_by(Axis.Z)[-2].edges().filter_by(Axis.X) \
-                .sort_by(Axis.Y)[0]@0.5
-            
-            # This fillet rounds off the floor of the bin nicely.
-            inner_fillet_rad=7.5/2 - wall_thickness
-            if inner_height == wall_height:
-                # It is it can also prevent the wall-base corner from being too thin.
-                inner_fillet_rad = max(inner_fillet_rad, wall_thickness)
-            if inner_fillet_rad:
-                fillet(faces().filter_by(Plane.XY).sort_by(Axis.Z)[-2].edges(), radius=inner_fillet_rad)
-            if divisions > 1:
-                dividors = divisions-1
-                dividor_space = inner_width / divisions
-                with Locations(inner_front_centre):
-                    with GridLocations(dividor_space, 1, dividors, 1):
-                        # Use inner_height if there's no shelf, otherwise
-                        # subtract the shelf's cuttout depth.
-                        Box(wall_thickness, inner_depth, inner_height - 1.1,
-                            align=(Align.CENTER, Align.MIN, Align.MIN))
+            if not solid:
+                inner_width = width * bin_size - bin_clearance*2 - wall_thickness*2
+                inner_depth = depth * bin_size - bin_clearance*2 - wall_thickness*2
+                with BuildSketch(faces().filter_by(Plane.XY).sort_by(Axis.Z)[-1]):
+                    RectangleRounded(inner_width, inner_depth,
+                                    radius=outer_rad - bin_clearance -
+                                        wall_thickness)
 
-            if scoop_rad and scoop_rad > 0:
-                with Locations(inner_front_centre):
-                    Scoop(scoop_rad, inner_width, inner_height,
-                          wall_thickness, shelf_clearance,
-                          align=(Align.CENTER, Align.MIN, Align.MIN)) 
+                inner_height = wall_height
+                if width > 1 or depth > 1 or half_grid:
+                    # For a bin that covers more than one square we need a floor
+                    # to connect the squares.
+                    inner_height -= wall_thickness
+                extrude(amount=-inner_height, mode=Mode.SUBTRACT)
+
+                inner_front_centre = faces().filter_by(Plane.XY) \
+                    .sort_by(Axis.Z)[-2].edges().filter_by(Axis.X) \
+                    .sort_by(Axis.Y)[0]@0.5
+
+                # This fillet rounds off the floor of the bin nicely.
+                inner_fillet_rad=7.5/2 - wall_thickness
+                if inner_height == wall_height:
+                    # It is it can also prevent the wall-base corner from being too thin.
+                    inner_fillet_rad = max(inner_fillet_rad, wall_thickness)
+                if inner_fillet_rad:
+                    fillet(faces().filter_by(Plane.XY).sort_by(Axis.Z)[-2].edges(), radius=inner_fillet_rad)
+                if divisions > 1:
+                    dividors = divisions-1
+                    dividor_space = inner_width / divisions
+                    with Locations(inner_front_centre):
+                        with GridLocations(dividor_space, 1, dividors, 1):
+                            # Use inner_height if there's no shelf, otherwise
+                            # subtract the shelf's cuttout depth.
+                            Box(wall_thickness, inner_depth, inner_height - 1.1,
+                                align=(Align.CENTER, Align.MIN, Align.MIN))
+
+                if scoop_rad and scoop_rad > 0:
+                    with Locations(inner_front_centre):
+                        Scoop(scoop_rad, inner_width, inner_height,
+                            wall_thickness, shelf_clearance,
+                            align=(Align.CENTER, Align.MIN, Align.MIN)) 
 
             if lip:
                 with Locations((0, 0, wall_height/2 + plate_height)):

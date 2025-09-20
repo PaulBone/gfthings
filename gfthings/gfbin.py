@@ -115,6 +115,12 @@ def main(argv: list[str] | None = None):
             "scoops and divisions aren't supported.",
         type=str,
         default="")
+    parser.add_argument(
+        "--solid",
+        help="Create a solid gridfinity bin. This is useful to make " +
+            "the base for further modeling and carve out the bin as "
+            "needed.",
+        action="store_true")
     
     args = parser.parse_args(argv)
 
@@ -155,6 +161,10 @@ def main(argv: list[str] | None = None):
         bin = None
         funky = args.funky
         if funky != "":
+            if args.solid:
+                print("Funky bins don't support the solid option.")
+                exit(1)
+
             if funky == "donut":
                 funky_expr = [[True, True, True], 
                             [True, False, True],
@@ -189,6 +199,10 @@ def main(argv: list[str] | None = None):
                         half_grid=args.half_grid,
                         wall_thickness=args.wall_thickness)
         elif args.half_wall:
+            if args.solid:
+                print("Half wall bins don't support the solid option.")
+                exit(1)
+
             bin = HalfWallBin(x, y, z,
                 divisions=divisions,
                 lip=not args.no_lip,
@@ -207,7 +221,8 @@ def main(argv: list[str] | None = None):
                 magnet_dia=args.magnet_dia,
                 magnet_depth=args.magnet_height,
                 half_grid=args.half_grid,
-                wall_thickness=args.wall_thickness)
+                wall_thickness=args.wall_thickness,
+                solid=solid)
         
         if args.vscode:
             from ocp_vscode import (show_object,

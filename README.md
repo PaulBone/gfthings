@@ -10,20 +10,121 @@ Gridfinity is an open source storage system best introduced
 Look on [thangs](thangs.com) and 
 [printables](printables.com) for more compatible parts.
 
-Setup, You can install with pipx.
+Install uv
+----------
 
-    sudo apt install pipx
-    pipx install gfthings
+Linux / macOS:
 
-If you want to modify gfthings then build it with poetry.
+    curl -LsSf https://astral.sh/uv/install.sh | sh
 
-    sudo apt install pipx
-    pipx install poetry
-    poetry add ocp-vscode
-    poetry install
+Windows (PowerShell):
 
-If you choose this option then you must prefix your commands with
-`poetry run`
+    powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+See [the uv install docs](https://docs.astral.sh/uv/getting-started/installation/)
+for package-manager alternatives (Homebrew, winget, scoop, pipx, etc.).
+
+Install gfthings as a CLI tool
+------------------------------
+
+Install gfthings into an isolated, uv-managed environment and put its
+commands (`gfbin`, `gfbase`, `gfedge`, `gfpin`) on your `PATH`:
+
+    uv tool install gfthings
+
+Upgrade or remove later with:
+
+    uv tool upgrade gfthings
+    uv tool uninstall gfthings
+
+Run without installing (uvx)
+----------------------------
+
+`uvx` runs a tool in a one-shot, ephemeral environment — handy for trying
+things out or for CI:
+
+    uvx --from gfthings gfbin -h
+    uvx --from gfthings gfbin -x 2 -y 3 -o bin.step
+    uvx --from gfthings gfbase -x 4 -y 3 -o base.step
+
+The `--from gfthings` is required because the command names (`gfbin`,
+etc.) don't match the package name.
+
+Recipe scripts (gfbin.sh / .ps1, gfbase.sh / .ps1, gfedge.sh / .ps1, gfpin.sh / .ps1)
+-------------------------------------------------------------------------------------
+
+For day-to-day printing it's awkward to remember the exact CLI flags
+that produced a particular part. The repo ships a pair of *recipe*
+launcher scripts for every tool — one Bash version (`*.sh`, for Linux
+and macOS) and one PowerShell version (`*.ps1`, for Windows) — that
+each declare the parameters as variables at the top, auto-derive the
+output filename from those variables, and then call `uvx --from <git
+URL> <tool>` for you.
+
+Workflow:
+
+1. Copy the recipe for the tool you want, renaming it to whatever
+   describes the part — e.g.
+
+       cp gfbin.sh   screws-bin-2x2x4.sh        # Linux / macOS
+       Copy-Item gfbin.ps1 .\screws-bin-2x2x4.ps1   # Windows
+
+2. Edit the variables at the top (dimensions, scoop, magnet flags,
+   output format, etc.) to taste.
+
+3. Run it:
+
+       ./screws-bin-2x2x4.sh                   # Linux / macOS
+       .\screws-bin-2x2x4.ps1                  # Windows
+
+The script prints the equivalent `uvx ... gfbin ...` invocation it's
+about to run, then writes a `.step` (or `.stl`) file next to the
+script. The filename is built from the parameters — toggling
+`NoMagnet=true` adds `_nomagnet` to the name, switching to `Format=stl`
+flips the extension, etc. — so the same recipe always regenerates the
+same file, and small tweaks produce uniquely-named siblings without
+clobbering anything.
+
+The Bash and PowerShell versions take exactly the same variables, so
+recipes are portable: a `.sh` and `.ps1` with the same values produce
+identical CAD output. Both pin `GfthingsSource` to the
+`bitranox/gfthings@py314compat` branch so 3.13 / 3.14 users get the
+upstream `build123d` `dev` branch automatically (see the Python 3.13 /
+3.14 note below); change that line if you want to track a different
+fork or branch.
+
+Tools covered: `gfbin` (bins), `gfbase` (bases), `gfedge` (drawer-edge
+fillers), `gfpin` (the small attaching pin).
+
+Develop gfthings
+----------------
+
+Clone the repo and let uv manage the environment:
+
+    uv sync                 # creates .venv and installs deps + project
+    uv add ocp-vscode       # optional: add a dependency
+    uv run gfbin -h         # run a script from the project
+
+`uv sync` also picks up the `test` dependency group; run the suite with:
+
+    uv run --group test pytest
+
+Python 3.13 / 3.14 note: the released `build123d` on PyPI (0.10.0)
+transitively pulls `vtk`, which has no Python 3.13 or 3.14 wheels, so a
+plain install fails on those interpreters. On 3.13 and 3.14 this project
+resolves `build123d` from its upstream `dev` branch (which depends on
+`cadquery-ocp-novtk` and skips the `vtk` dependency entirely) via a
+marker-conditional `[tool.uv.sources]` entry — `uv sync`, `uv tool
+install`, and `uvx --from .` all work from a checkout. On 3.10–3.12 the
+regular PyPI release is used.
+
+The `[tool.uv.sources]` block is uv-specific metadata and is not baked
+into a built wheel, so the project remains publishable to PyPI. Plain
+`pip install gfthings` on 3.13 / 3.14 will still fail (pip ignores
+`[tool.uv.sources]` and tries to resolve the released wheel, which then
+hits the missing `vtk` wheels) until upstream `build123d` ships a release
+that also targets 3.13+ — `uv` is the supported install path on those
+versions for now.
 
 Copyright (C) Paul Bone
 Distributed under: CC BY-NC-SA 4.0

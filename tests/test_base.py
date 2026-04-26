@@ -81,3 +81,45 @@ def test_screw_holes():
                          screw_hole_pattern_drawer=False,
                          corner_screw_hole_count=0)
     float_eq(9623.029985813218, base.volume)
+
+# --- --no-magnet variants -------------------------------------------------
+# `magnet=False` skips the counterbore that combines screw + magnet recess
+# and replaces it with a plain through-hole at screw_rad. The base is
+# slightly heavier than the equivalent magneted base because the magnet
+# pocket volume is no longer subtracted.
+
+def test_2x2_base_no_magnet():
+    base = Base.BaseGrid(2, 2,
+                         magnet_rad=3.1,
+                         magnet_depth=2,
+                         screw_rad=2,
+                         counter_sink=False,
+                         magnet=False,
+                         screw_hole_count=2,
+                         screw_hole_pattern_drawer=False,
+                         corner_screw_hole_count=0)
+    float_eq(9705.824064564506, base.volume)
+
+def test_1x1_base_no_magnet():
+    base = Base.BaseGrid(1, 1,
+                         magnet_rad=3.1,
+                         magnet_depth=2,
+                         screw_rad=2,
+                         counter_sink=False,
+                         magnet=False,
+                         screw_hole_count=2,
+                         screw_hole_pattern_drawer=False,
+                         corner_screw_hole_count=0)
+    float_eq(2454.3226457171168, base.volume)
+
+def test_4_holes_no_magnet():
+    base = Base.BaseGrid(2, 2,
+                         magnet_rad=3.1,
+                         magnet_depth=2,
+                         screw_rad=2,
+                         counter_sink=False,
+                         magnet=False,
+                         screw_hole_count=4,
+                         screw_hole_pattern_drawer=False,
+                         corner_screw_hole_count=0)
+    float_eq(11548.322125649871, base.volume)

@@ -13,7 +13,16 @@ class Pin(BasePartObject):
                  align: Align | tuple[Align, Align, Align] = None,
                  mode: Mode = Mode.ADD):
         with BuildPart() as p:
-            total_height = 3.2 + plate_base_height + 0.5
+            # `plate_base_height` was originally a constant (2.9) and became
+            # a function `(short: bool) -> float` when --short bases were
+            # added (build123d commit e7296b9). Pin was not migrated at the
+            # time, so `3.2 + plate_base_height + 0.5` raised
+            # `TypeError: unsupported operand type(s) for +: 'float' and
+            # 'function'` on every invocation of `gfpin`. Pins are physical
+            # parts independent of base height and the original code targeted
+            # the 2.9mm (non-short) base, so we explicitly pass False here to
+            # preserve the historical geometry.
+            total_height = 3.2 + plate_base_height(False) + 0.5
             shaft_len = total_height - (magnet_dia - screw_dia)/2
             inner_shaft = 1.0
             outer_shaft = 1.7

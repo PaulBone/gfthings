@@ -51,3 +51,20 @@ def test_nolip():
     bin = Bin.Bin(1, 1, 4, scoop_rad=0, divisions=1,
                   label=False, lip=False)
     float_eq(10817.207884007077, bin.volume)
+
+# --- --no-magnet variants -------------------------------------------------
+# `magnet=False` skips both the refined side-insertable slots and the
+# unrefined bottom holes. Bins have no screw holes, so the result is a
+# plain base profile — slightly heavier than the magneted bin because no
+# magnet apertures are subtracted.
+
+def test_simple_bin_no_magnet():
+    bin = Bin.Bin(1, 1, 4, scoop_rad=0, divisions=1, label=False, magnet=False)
+    float_eq(12809.059717125214, bin.volume)
+
+def test_simple_bin_no_magnet_unrefined():
+    # Same volume as the refined case: when magnet=False both branches
+    # are skipped, so refined / unrefined make no difference.
+    bin = Bin.Bin(1, 1, 4, scoop_rad=0, divisions=1, label=False,
+                  magnet=False, refined=False)
+    float_eq(12809.059717125214, bin.volume)

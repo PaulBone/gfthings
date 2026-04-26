@@ -42,13 +42,18 @@ class BinBase(BasePartObject):
                  refined: bool,
                  magnet_dia: float,
                  magnet_depth: float,
+                 magnet: bool = True,
                  bin_size: float = 42,
                  rotation: tuple[float, float, float] | Rotation = (0, 0, 0),
                  align: Align | tuple[Align, Align, Align] = None,
                  mode: Mode = Mode.ADD):
         with BuildPart() as p:
             GFProfileBin(bin_size=bin_size)
-            if refined:
+            if not magnet:
+                # Skip both refined slots and unrefined holes — bins don't
+                # have screw holes, so --no-magnet means a plain base.
+                pass
+            elif refined:
                 with Locations(faces().filter_by(Plane.XY).sort_by(Axis.Z)[0]):
                     with PolarLocations(0, 4):
                         with Locations((35.6/2-4.8+magnet_dia/2, 35.6/2+0.8+2.15)):
@@ -61,7 +66,7 @@ class BinBase(BasePartObject):
                 with Locations(faces().filter_by(Plane.XY).sort_by(Axis.Z)[0]):
                     magnet_offset = 35.6/2 - 4.8
                     with GridLocations(magnet_offset*2, magnet_offset*2, 2, 2):
-                        Hole(magnet_dia/2, magnet_depth)                
+                        Hole(magnet_dia/2, magnet_depth)
             
         super().__init__(p.part, rotation, align, mode)
 
@@ -155,6 +160,7 @@ class Bin(BasePartObject):
                  scoop_rad : float,
                  divisions : int = 1,
                  refined : bool = True,
+                 magnet : bool = True,
                  magnet_dia : float = 6,
                  magnet_depth : float = 2,
                  half_grid : bool = False,
@@ -184,6 +190,7 @@ class Bin(BasePartObject):
                 with GridLocations(bs, bs, int(w), int(d)):
                     BinBase(refined=refined,
                             bin_size = 42 if not half_grid else 21,
+                            magnet=magnet,
                             magnet_dia=magnet_dia,
                             magnet_depth=magnet_depth,
                             align=(Align.CENTER, Align.CENTER, Align.MAX))
@@ -197,22 +204,75 @@ class Bin(BasePartObject):
             
             inner_height = wall_height
             if width > 1 or depth > 1 or half_grid:
-                # For a bin that covers more than one square we need a floor 
+                # For a bin that covers more than one square we need a floor
                 # to connect the squares.
                 inner_height -= wall_thickness
             extrude(amount=-inner_height, mode=Mode.SUBTRACT)
             
-            inner_front_centre = faces().filter_by(Plane.XY) \
-                .sort_by(Axis.Z)[-2].edges().filter_by(Axis.X) \
-                .sort_by(Axis.Y)[0]@0.5
-            
+            # Pick the cavity-floor face explicitly instead of trusting
+            # `sort_by(Axis.Z)[-2]`.
+            #
+            # Why this is needed on the dev branch of build123d:
+            #   When the cavity carve depth equals the box height (1x1 bins),
+            #   the cavity floor lands exactly on the BinBase top face. The
+            #   dev-branch boolean leaves *two* coplanar faces at that Z:
+            #     - the actual cavity floor (8 edges, bbox ±19.55 = inner
+            #       cavity outline)
+            #     - the BinBase top (16 edges, bbox ±20.75 = bin outline,
+            #       with a near-degenerate duplicate inner edge ring at
+            #       ±20.74 — a topological artifact of the boolean engine)
+            #   `sort_by(Axis.Z)[-2]` picks one or the other depending on
+            #   internal sort stability, which varies with bin height
+            #   (e.g. h=4/h=6 happen to pick the cavity floor; h=5/h=8 pick
+            #   BinBase top). When BinBase top is picked:
+            #     1. `inner_front_centre` lands at Y=-20.75 (bin outer wall)
+            #        instead of Y=-19.55 (cavity inner wall) — the scoop is
+            #        then positioned 1.2mm too far back, with part of it
+            #        embedded in the wall material and only the rest adding
+            #        new volume.
+            #     2. The fillet on the BinBase-top face fails outright
+            #        because of the degenerate inner edge ring.
+            #   Selecting the smallest-area XY face at the cavity-floor Z
+            #   reliably resolves to the actual cavity floor in every case.
+            xy_floors = faces().filter_by(Plane.XY).sort_by(Axis.Z)
+            cavity_z = xy_floors[-2].center().Z
+            cavity_floor = min(
+                (f for f in xy_floors if abs(f.center().Z - cavity_z) < 1e-6),
+                key=lambda f: f.bounding_box().size.X * f.bounding_box().size.Y,
+            )
+            inner_front_centre = cavity_floor.edges().filter_by(Axis.X).sort_by(Axis.Y)[0]@0.5
+            # Snap a near-zero X coordinate to exactly 0.
+            #
+            # The midpoint of the front-most X-axis edge can land at
+            # X = -2e-9 due to floating-point drift in the symmetrically
+            # constructed cavity outline. That exact offset, when fed into
+            # `Locations(...)` for the subsequent Scoop placement, triggers
+            # an OCCT boolean-ADD bug on the dev branch: the resulting
+            # solid is just the scoop alone (the entire bin gets dropped).
+            # Other tiny X values (0, +1e-9, -1e-12) all work fine — only
+            # this specific magnitude/sign combination breaks. Snapping any
+            # sub-µm X value to zero sidesteps it without affecting the
+            # geometry the user actually sees.
+            if abs(inner_front_centre.X) < 1e-6:
+                inner_front_centre = Vector(0, inner_front_centre.Y, inner_front_centre.Z)
+
             # This fillet rounds off the floor of the bin nicely.
             inner_fillet_rad=7.5/2 - wall_thickness
             if inner_height == wall_height:
                 # It is it can also prevent the wall-base corner from being too thin.
                 inner_fillet_rad = max(inner_fillet_rad, wall_thickness)
             if inner_fillet_rad:
-                fillet(faces().filter_by(Plane.XY).sort_by(Axis.Z)[-2].edges(), radius=inner_fillet_rad)
+                # Re-resolve the cavity floor here: the divisions block above
+                # may have added internal walls that change the face stack
+                # (their tops show up as additional XY faces). Same selection
+                # rule as before — smallest-area face at the cavity-floor Z.
+                xy_floors = faces().filter_by(Plane.XY).sort_by(Axis.Z)
+                cavity_z = xy_floors[-2].center().Z
+                cavity_floor = min(
+                    (f for f in xy_floors if abs(f.center().Z - cavity_z) < 1e-6),
+                    key=lambda f: f.bounding_box().size.X * f.bounding_box().size.Y,
+                )
+                fillet(cavity_floor.edges(), radius=inner_fillet_rad)
             if divisions > 1:
                 dividors = divisions-1
                 dividor_space = inner_width / divisions
@@ -268,6 +328,7 @@ class FunkyBin(BasePartObject):
                  array : list,
                  height_units : int,
                  refined : bool = True,
+                 magnet : bool = True,
                  magnet_dia : float = 6,
                  magnet_depth : float = 2,
                  wall_thickness : float = 1.2,
@@ -310,6 +371,7 @@ class FunkyBin(BasePartObject):
                                         (y - depth/2 + 1/2)*bin_size,
                                         -wall_height/2)):
                             BinBase(refined=refined,
+                                    magnet=magnet,
                                     magnet_depth=magnet_depth,
                                     magnet_dia=magnet_dia,
                                     align=(Align.CENTER, Align.CENTER, Align.MAX))
@@ -328,6 +390,7 @@ class HalfWallBin(BasePartObject):
                  divisions : int = 1,
                  lip : bool = True,
                  refined : bool = True,
+                 magnet : bool = True,
                  half_grid : bool = False,
                  wall_thickness : float = 1.2,
                  magnet_dia : float = 6,
@@ -338,6 +401,7 @@ class HalfWallBin(BasePartObject):
                 divisions=divisions,
                 lip=lip,
                 refined=refined,
+                magnet=magnet,
                 magnet_dia=magnet_dia,
                 magnet_depth=magnet_depth,
                 scoop_rad=0,

@@ -34,9 +34,9 @@ def main(argv: list[str] | None = None):
         show_object(pin)
     else:
         if args.output.endswith(".step"):
-            export_step(bin, args.output)
+            export_step(pin, args.output)
         elif args.output.endswith('.stl'):
-            export_stl(bin, args.output)
+            export_stl(pin, args.output)
         else:
             print("Unknown output format.")
             exit(1)

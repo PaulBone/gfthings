@@ -1,38 +1,60 @@
-[tool.poetry]
+[project]
 name = "gfthings"
 version = "0.8.0"
 description = "Paul's Gridfinity Things"
-authors = ["Paul Bone <paul@bone.id.au>"]
-license = "CC BY-NC-SA 4.0"
+authors = [
+    { name = "Paul Bone", email = "paul@bone.id.au" },
+]
+license = "CC-BY-NC-SA-4.0"
 readme = "README.md"
+requires-python = ">=3.10,<3.15"
 classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: POSIX :: Linux",
 ]
-packages = [{include = "gfthings"}]
+dependencies = [
+    "build123d>=0.10.0",
+]
 
-[tool.poetry.group.test.dependencies]
-pytest = "^8.3.5"
+[tool.uv.sources]
+# Released build123d 0.10.0 transitively pulls vtk, which has no wheel for
+# Python 3.13+ — so for 3.13 and 3.14 we resolve build123d from its
+# upstream dev branch (which depends on cadquery-ocp-novtk and skips vtk
+# entirely). Python 3.10–3.12 keep using the released wheel from PyPI.
+build123d = [
+    { git = "https://github.com/gumyr/build123d.git", branch = "dev", marker = "python_version >= '3.13'" },
+]
 
 [project.urls]
 Homepage = "https://github.com/PaulBone/gfthings"
 
-[tool.poetry.scripts]
+[project.scripts]
 gfpin = "gfthings.gfpin:main"
 gfbin = "gfthings.gfbin:main"
 gfbase = "gfthings.gfbase:main"
 gfedge = "gfthings.gfedge:main"
 
-[tool.poetry.dependencies]
-python = ">=3.10,<3.14"
-build123d = "^0.9.1"
+[dependency-groups]
+test = [
+    "pytest>=8.3.5,<9.0.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["gfthings"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "gfthings",
+    "tests",
+    "README.md",
+]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
 testpaths = [
     "tests",
 ]
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"

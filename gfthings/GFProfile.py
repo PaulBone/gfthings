@@ -35,7 +35,31 @@ class GFProfile(BasePartObject):
             # build123d can't handle a line with no length.
             if base == 0:
                 base = 0.01
-            with BuildSketch(Plane(origin=path@0, z_dir=path%0).rotated((-90, 0, 0))):
+            # Pin the sketch plane orientation explicitly so the swept profile
+            # ends up with its local +Y aligned with world +Z (the gridfinity
+            # base height direction).
+            #
+            # Why this is needed on the dev branch of build123d:
+            #   `Plane(origin, z_dir)` auto-computes x_dir/y_dir from z_dir.
+            #   The auto-computation takes a different code path when z_dir is
+            #   *exactly* axis-aligned vs. only nearly so. For non-square paths
+            #   (e.g. width=1, depth=2) `path%0` returns exactly (-1, 0, 0)
+            #   and the resulting plane has y_dir = (0, -1, 0); for square
+            #   paths floating-point noise puts z_dir slightly off-axis and
+            #   the plane has y_dir = (0, 0, 1). The polyline is drawn with
+            #   its "up" direction along local +Y, so when y_dir flips the
+            #   sweep ends up along world Y instead of Z, the SUBTRACT misses
+            #   the extruded box, and GFProfile collapses to volume 0.
+            #   The previous `.rotated((-90, 0, 0))` worked around the 0.10.0
+            #   convention; the dev branch flipped the convention so we now
+            #   pin x_dir directly.
+            #
+            # x_dir = world_Z × z_dir gives a vector lying in the world XY
+            # plane perpendicular to the path tangent. y_dir = z_dir × x_dir
+            # then comes out as world +Z, which is what the polyline expects.
+            sweep_z = path%0
+            sweep_x = Vector(0, 0, 1).cross(sweep_z).normalized()
+            with BuildSketch(Plane(origin=path@0, x_dir=sweep_x, z_dir=sweep_z)):
                 with BuildLine():
                         Polyline(
                             (0, support),

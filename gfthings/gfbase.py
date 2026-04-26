@@ -72,6 +72,12 @@ def main(argv: list[str] | None = None):
         "--short",
         help="Make the short variant, doesn't support screw holes",
         action="store_true")
+    parser.add_argument(
+        "--no-magnet",
+        help="Skip the magnet pocket. Screw holes are kept as plain " +
+             "through holes at --screw-diameter so the base can still be " +
+             "fastened down.",
+        action="store_true")
 
     args = parser.parse_args(argv)
 
@@ -109,6 +115,7 @@ def main(argv: list[str] | None = None):
                         magnet_rad=magnet_rad,
                         magnet_depth=magnet_depth,
                         counter_sink=counter_sink,
+                        magnet=not args.no_magnet,
                         screw_hole_count=screw_hole_count,
                         screw_hole_pattern_drawer=args.screw_hole_pattern_drawer,
                         short=args.short)

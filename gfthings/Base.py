@@ -14,6 +14,7 @@ class ScrewSupport(BasePartObject):
                  magnet_depth : float = 2,
                  screw_rad : float = 2,
                  counter_sink : bool = True,
+                 magnet : bool = True,
                  margin : float = 2,
                  rotation: tuple[float, float, float] | Rotation = (0, 0, 0),
                  align: Align | tuple[Align, Align, Align] = None,
@@ -29,7 +30,11 @@ class ScrewSupport(BasePartObject):
             with Locations(faces().filter_by(Plane.XY).sort_by(Axis.Z)[-1]):
                 offset = screw_offset - len/2
                 with Locations((offset, offset)):
-                    if counter_sink:
+                    if not magnet:
+                        # Skip the magnet pocket — plain through-hole at
+                        # screw size so the base can still be screwed down.
+                        Hole(screw_rad)
+                    elif counter_sink:
                         CounterSinkHole(screw_rad, magnet_rad)
                     else:
                         CounterBoreHole(screw_rad, magnet_rad, magnet_depth)
@@ -84,6 +89,7 @@ class BaseSquare(BasePartObject):
                  magnet_depth : float = 2,
                  screw_rad : float = 2,
                  counter_sink : bool = False,
+                 magnet : bool = True,
                  screw_hole_count : int = 2,
                  short : bool = False,
                  rotation: tuple[float, float, float] | Rotation = (0, 0, 0),
@@ -100,8 +106,9 @@ class BaseSquare(BasePartObject):
                                 magnet_depth=magnet_depth,
                                 screw_rad=screw_rad,
                                 counter_sink=counter_sink,
+                                magnet=magnet,
                                 align=(Align.MIN, Align.MIN, Align.MIN))
-                    
+
                 with Locations(
                         vertices().group_by(Axis.Z)[0].group_by(Axis.X)[-1].
                         sort_by(Axis.Y)[-1]):
@@ -109,6 +116,7 @@ class BaseSquare(BasePartObject):
                                 magnet_depth=magnet_depth,
                                 screw_rad=screw_rad,
                                 counter_sink=counter_sink,
+                                magnet=magnet,
                                 align=(Align.MIN, Align.MIN, Align.MIN),
                                 rotation=(0, 0, 180))
 
@@ -120,6 +128,7 @@ class BaseSquare(BasePartObject):
                                 magnet_depth=magnet_depth,
                                 screw_rad=screw_rad,
                                 counter_sink=counter_sink,
+                                magnet=magnet,
                                 align=(Align.MIN, Align.MIN, Align.MIN),
                                 rotation=(0, 0, 90))
                 with Locations(
@@ -129,6 +138,7 @@ class BaseSquare(BasePartObject):
                                 magnet_depth=magnet_depth,
                                 screw_rad=screw_rad,
                                 counter_sink=counter_sink,
+                                magnet=magnet,
                                 align=(Align.MIN, Align.MIN, Align.MIN),
                                 rotation=(0, 0, 270))
 
@@ -149,6 +159,7 @@ class BaseGrid(BasePartObject):
                  magnet_depth : float = 2,
                  screw_rad : float = 2,
                  counter_sink : bool = False,
+                 magnet : bool = True,
                  screw_hole_count : int = 2,
                  screw_hole_pattern_drawer : bool = False,
                  short : bool = False,
@@ -163,17 +174,19 @@ class BaseGrid(BasePartObject):
                     screw_rad=screw_rad,
                     screw_hole_count=screw_hole_count,
                     counter_sink=counter_sink,
+                    magnet=magnet,
                     short=short)
 
             if screw_hole_pattern_drawer and x_num > 2 and y_num > 2:
                 with Locations(faces().filter_by(Plane.XY).sort_by(Axis.Z)[0].center()):
-                    with Locations((-(bin_size * x_num)/2+bin_size, 
-                                    -(bin_size * y_num)/2+bin_size, 
+                    with Locations((-(bin_size * x_num)/2+bin_size,
+                                    -(bin_size * y_num)/2+bin_size,
                                     0)):
                         ScrewSupport(magnet_rad=magnet_rad,
                                     magnet_depth=magnet_depth,
                                     screw_rad=screw_rad,
                                     counter_sink=counter_sink,
+                                    magnet=magnet,
                                     align=(Align.MIN, Align.MIN, Align.MIN))
                     with Locations((-(bin_size * x_num)/2+bin_size,
                                     (bin_size * y_num)/2-bin_size,
@@ -182,6 +195,7 @@ class BaseGrid(BasePartObject):
                                     magnet_depth=magnet_depth,
                                     screw_rad=screw_rad,
                                     counter_sink=counter_sink,
+                                    magnet=magnet,
                                     rotation=(0, 0, 270),
                                     align=(Align.MIN, Align.MIN, Align.MIN))
                     with Locations(((bin_size * x_num)/2-bin_size,
@@ -191,6 +205,7 @@ class BaseGrid(BasePartObject):
                                     magnet_depth=magnet_depth,
                                     screw_rad=screw_rad,
                                     counter_sink=counter_sink,
+                                    magnet=magnet,
                                     rotation=(0, 0, 180),
                                     align=(Align.MIN, Align.MIN, Align.MIN))
                     with Locations(((bin_size * x_num)/2-bin_size,
@@ -200,6 +215,7 @@ class BaseGrid(BasePartObject):
                                     magnet_depth=magnet_depth,
                                     screw_rad=screw_rad,
                                     counter_sink=counter_sink,
+                                    magnet=magnet,
                                     rotation=(0, 0, 90),
                                     align=(Align.MIN, Align.MIN, Align.MIN))
 

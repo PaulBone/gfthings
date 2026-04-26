@@ -22,7 +22,7 @@ def main(argv: list[str] | None = None):
     parser.add_argument(
         "--loop",
         help="Generate a number of bins in a loop, bins will be named " +
-             "bin_\*.step.",
+             "bin_*.step.",
         default=False,
         action="store_true")
     parser.add_argument(
@@ -70,11 +70,16 @@ def main(argv: list[str] | None = None):
     parser.add_argument(
         "--unrefined",
         help="Use unrefined magnet holes. " +
-            "Gridfinity Refind " + 
+            "Gridfinity Refind " +
             "https://www.printables.com/model/413761-gridfinity-refined " +
             "has improved magnet holes that don't require glue, " +
             "If for some reason you don't want superiour magnet holes then " +
             "--unrefind will switch to plain circular holes",
+        action="store_true")
+    parser.add_argument(
+        "--no-magnet",
+        help="Skip magnet holes entirely. The bin's base profile is " +
+             "produced without any magnet pockets or refined magnet slots.",
         action="store_true")
     parser.add_argument(
         "--magnet-dia",
@@ -184,6 +189,7 @@ def main(argv: list[str] | None = None):
                 funky_expr = eval(args.funky)
             bin = FunkyBin(list(reversed(funky_expr)), z,
                         refined=not args.unrefined,
+                        magnet=not args.no_magnet,
                         magnet_dia=args.magnet_dia,
                         magnet_depth=args.magnet_height,
                         half_grid=args.half_grid,
@@ -193,9 +199,10 @@ def main(argv: list[str] | None = None):
                 divisions=divisions,
                 lip=not args.no_lip,
                 refined=not args.unrefined,
+                magnet=not args.no_magnet,
                 magnet_dia=args.magnet_dia,
                 magnet_depth=args.magnet_height,
-                half_grid=args.half_grid,                
+                half_grid=args.half_grid,
                 wall_thickness=args.wall_thickness)
 
         else:
@@ -204,6 +211,7 @@ def main(argv: list[str] | None = None):
                 label=not args.no_label,
                 lip=not args.no_lip,
                 refined=not args.unrefined,
+                magnet=not args.no_magnet,
                 magnet_dia=args.magnet_dia,
                 magnet_depth=args.magnet_height,
                 half_grid=args.half_grid,

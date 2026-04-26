@@ -3,3 +3,160 @@
 __pycache__
 .venv
 dist
+uv.lock
+
+# ====================================
+# IDEs & Editors
+# ====================================
+# IntelliJ, PyCharm, etc.
+.idea/
+# VS Code workspace settings
+.vscode/
+*.code-workspace
+
+# ====================================
+# Python bytecode & caches
+# ====================================
+# __pycache__: compiled .pyc files at any depth
+# *.py[cod]: catches .pyc, .pyo, .pyd
+__pycache__/
+*.py[cod]
+*$py.class     # other compiled artifacts
+
+# pytest, coverage, MyPy, Hypothesis
+.pytest_cache/
+.mypy_cache/
+.pyright/
+.coverage*
+htmlcov/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.tox/
+.nox/
+
+# general cache directories (any project-level caching)
+.cache/
+.run/
+.import_linter_cache/
+
+# ====================================
+# Build & distribution artifacts
+# ====================================
+# source/package builds
+build/
+dist/
+*.egg-info/    # metadata for pip installs
+*.egg
+*.whl
+pip-wheel-metadata/
+*.manifest     # PyInstaller metadata
+*.spec         # PyInstaller spec files
+
+# Eggs, parts, wheels, sdist, etc.
+develop-eggs/
+.eggs/
+parts/
+sdist/
+wheels/
+downloads/
+var/
+
+# pip logs & installer leftovers
+pip-log.txt
+pip-delete-this-directory.txt
+.installed.cfg
+
+# ====================================
+# Virtual environments & secrets
+# ====================================
+# common venv folder names
+env/
+venv/
+ENV/
+.venv/
+# backups, alternate names
+env.bak/
+venv.bak/
+# dotenv files with credentials
+.env
+
+# ====================================
+# Project-specific & framework files
+# ====================================
+# Django logs & local overrides
+*.log
+local_settings.py
+
+# Flask instance folder
+instance/
+.webassets-cache
+
+# Scrapy cache
+.scrapy
+
+# Sphinx docs
+docs/_build/
+
+# PyBuilder output
+target/
+
+# Jupyter notebooks checkpoints
+.ipynb_checkpoints
+
+# pyenv Python version file
+.python-version
+
+# Celery beat schedule
+celerybeat-schedule
+
+# SageMath parsed files
+*.sage.py
+
+# Spyder IDE
+.spyderproject
+.spyproject
+
+# Rope IDE
+.ropeproject
+
+# MkDocs static site folder
+/site
+
+# ====================================
+# OS-specific files
+# ====================================
+# macOS
+.DS_Store
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# Archives
+*.zip
+
+# Thunderbird build artifact (created temporarily by pack script)
+sources/manifest.json
+
+# ====================================
+# Tool-specific extras
+# ====================================
+# Codecov uploader script (downloaded during local uploads)
+codecov.sh
+codecov.xml
+
+# Nix build result symlink
+result
+
+# Optional lockfiles (for alternative managers)
+poetry.lock
+pdm.lock
+uv.lock
+
+# div
+# .devcontainer/ # needed for github codespaces
+.claude/
+CLAUDE.md
+old_code/
+prompts.md

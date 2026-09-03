@@ -212,7 +212,12 @@ class Bin(BasePartObject):
                 # It is it can also prevent the wall-base corner from being too thin.
                 inner_fillet_rad = max(inner_fillet_rad, wall_thickness)
             if inner_fillet_rad:
-                fillet(faces().filter_by(Plane.XY).sort_by(Axis.Z)[-2].edges(), radius=inner_fillet_rad)
+                try:
+                  fillet(faces().filter_by(Plane.XY).sort_by(Axis.Z)[-2].edges(), radius=inner_fillet_rad)
+                except ValueError:
+                  # This fillet fails for some bins, but it's okay it was
+                  # just "nice to have".
+                  pass
             if divisions > 1:
                 dividors = divisions-1
                 dividor_space = inner_width / divisions

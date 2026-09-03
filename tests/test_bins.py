@@ -25,6 +25,15 @@ def test_tall_bin():
     bin = Bin.Bin(1, 1, 6, scoop_rad=0, divisions=1, label=False)
     float_eq(14893.843256865446, bin.volume)
 
+# Bins 7 and 8 units high were broken.
+def test_very_tall_bin():
+    bin = Bin.Bin(1, 1, 7, scoop_rad=12.5)
+    float_eq(20540.844714546074, bin.volume)
+
+def test_really_tall_bin():
+    bin = Bin.Bin(1, 1, 8, scoop_rad=12.5)
+    float_eq(21892.27899526943, bin.volume)
+
 def test_bin_shelf():
     bin = Bin.Bin(1, 1, 4, scoop_rad=0, divisions=1, label=True)
     float_eq(15245.41393395344, bin.volume)

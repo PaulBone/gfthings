@@ -22,7 +22,7 @@ def main(argv: list[str] | None = None):
     parser.add_argument(
         "--loop",
         help="Generate a number of bins in a loop, bins will be named " +
-             "bin_\*.step.",
+             "bin_*.step.",
         default=False,
         action="store_true")
     parser.add_argument(

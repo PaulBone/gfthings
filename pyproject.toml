@@ -27,7 +27,7 @@ gfedge = "gfthings.gfedge:main"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.14"
-build123d = "^0.9.1"
+build123d = "^0.10.0"
 
 [tool.pytest.ini_options]
 minversion = "6.0"

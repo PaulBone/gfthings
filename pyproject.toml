@@ -1,33 +1,37 @@
-[tool.poetry]
-version = "0.8.1"
+[project]
+name = "gfthings"
+version = "0.9.0"
 description = "Paul's Gridfinity Things"
-authors = ["Paul Bone <paul@bone.id.au>"]
-license = "CC BY-NC-SA 4.0"
+authors = [
+  {name = "Paul Bone", email = "paul@bone.id.au>"}
+]
+license = "CC-BY-NC-SA-4.0"
 readme = "README.md"
 classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: POSIX :: Linux",
 ]
 packages = [{include = "gfthings"}]
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "build123d>=0.10,<0.11",
 
-[tool.poetry.group.test.dependencies]
-pytest = "^8.3.5"
-
-[project]
-name = "gfthings"
+    # it's not a direct dependency but some later versions break with ocp.
+    "ocp-gordon>=0.2,<0.3",
+]
 
 [project.urls]
 Homepage = "https://github.com/PaulBone/gfthings"
 
-[tool.poetry.scripts]
+[project.scripts]
 gfpin = "gfthings.gfpin:main"
 gfbin = "gfthings.gfbin:main"
 gfbase = "gfthings.gfbase:main"
 gfedge = "gfthings.gfedge:main"
 
-[tool.poetry.dependencies]
-python = ">=3.10,<3.14"
-build123d = "^0.10.0"
+[build-system]
+requires = ["uv_build"]
+build-backend = "uv_build"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
@@ -35,6 +39,9 @@ testpaths = [
     "tests",
 ]
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[dependency-groups]
+dev = [
+    "ocp-vscode>=4.0.1",
+    "pytest>=9.1.1",
+]
+

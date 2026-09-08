@@ -1,9 +1,9 @@
 # Copyright (C) Paul Bone
 # CC BY-NC-SA 4.0
 
-import gfthings.Bin as Bin
-
 from Utils import float_eq
+
+import gfthings.Bin as Bin
 
 def test_simple_bin():
     bin = Bin.Bin(1, 1, 4, scoop_rad=0, divisions=1, label=False)

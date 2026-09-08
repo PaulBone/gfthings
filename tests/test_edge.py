@@ -2,8 +2,9 @@
 # Copyright (C) Paul Bone
 # CC BY-NC-SA 4.0
 
-from gfthings.Edge import Edge
 from Utils import float_eq
+
+from gfthings.Edge import Edge
 
 def test_simple_edge():
     edge = Edge(1, 21)

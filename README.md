@@ -13,17 +13,28 @@ Look on [thangs](thangs.com) and
 Setup, You can install with pipx.
 
     sudo apt install pipx
-    pipx install gfthings
+    pipx install --python python3.12 gfthings
 
-If you want to modify gfthings then build it with poetry.
+Or with uv, which also makes installing the correct python version easier.
 
-    sudo apt install pipx
-    pipx install poetry
-    poetry add ocp-vscode
-    poetry install
+1. [Install uv](https://docs.astral.sh/uv)
+2. Use python 3.12
+    uv python install cpython-3.12
+3. Install gfthings
+    uv tool install -p python3.12 gfthings
 
-If you choose this option then you must prefix your commands with
-`poetry run`
+If you want to modify gfthings then build it with uv.
+
+1. [Install uv](https://docs.astral.sh/uv)
+2. Use python 3.12
+    uv python install cpython-3.12
+2. Tell UV that you also want development dependencies installed
+    uv sync --extra dev
+4. Activate the local virtual environment for this shell
+    . .venv/bin/activate
+
+If you choose this option then you must run commands from the local virtual
+environment (step 4).
 
 Copyright (C) Paul Bone
 Distributed under: CC BY-NC-SA 4.0

@@ -1,8 +1,9 @@
 # Copyright (C) Paul Bone
 # CC BY-NC-SA 4.0
 
-import gfthings.Base as Base
 from Utils import float_eq
+
+import gfthings.Base as Base
 
 def test_2x2_base():
     base = Base.BaseGrid(2, 2,
